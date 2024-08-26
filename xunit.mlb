@@ -1,6 +1,8 @@
 $(SML_LIB)/basis/basis.mlb
 src/assert.sig
 src/assert.sml
+src/test_result.sig
+src/test_result.sml
 src/test.sig
 src/test.sml
 src/reporter.sig

@@ -6,45 +6,49 @@ results in the style of JUnit.
 If any failures or errors occur, print those out with a bit more
 detail.
 *)
-structure JUnitTt : REPORTER = struct
+structure JUnitTt :> REPORTER = struct
   type t = unit;
+  structure Result = Test.Result;
 
-  fun intervalToString (dt : Time.time) : string =
+  fun interval_to_string (dt : Time.time) =
     (LargeInt.toString (Time.toMicroseconds dt))^"ms";
   
-  fun count_tests_run ({success, fail, errors} : Test.ResultSummary)
-    = success + fail + errors;
+  fun report_iter p =
+    let
+      fun for_case c =
+        if Result.is_failure c
+        then concat [Test.path p (Result.name c),
+                     " FAIL: ",
+                     Result.msg c,
+                     "\n"]
+        else if Result.is_error c
+        then concat [Test.path p (Result.name c),
+                     " ERROR: ",
+                     (Result.exn_message c),
+                     "\n"]
+        else "";
+      fun for_suite result rs =
+        let
+          val p2 = Test.path p (Result.name result);
+        in
+          concat ["Running ", p2, "\n",
+                  concat (map (report_iter p2) rs),
+                  "Tests run: ",
+                  Int.toString(Result.count_total result),
+                  ", Failures: ",
+                  Int.toString(Result.count_failures result),
+                  ", Errors: ",
+                  Int.toString(Result.count_errors result),
+                  ", Time elapsed: ",
+                  interval_to_string (Result.realtime result),
+                  " - in ",
+                  (Result.name result), "\n"]
+        end;
+    in
+      fn result => Result.report for_case for_suite result
+    end;
 
-  fun report_iter path (Test.ResultCase (name, dt, outcome) : Test.Result) =
-    (case outcome of
-         (Test.Failure msg) => print ((Test.path path name) ^
-                                      " FAIL: " ^ msg ^ "\n")
-       | (Test.Exception e) => print ((Test.path path name) ^
-                                      " ERROR: " ^
-                                      (exnMessage e) ^
-                                      "\n")
-       | _ => ())
-    | report_iter path (r as (Test.ResultSuite (name, dt, results))) =
-      let
-        val summary = Test.summarize r;
-        val new_path = Test.path path name;
-      in
-        (print ("Running "^new_path^"\n");
-         app (report_iter new_path) results;
-         print (concat ["Tests run: ",
-                        Int.toString (count_tests_run summary),
-                        ", ",
-                        "Failures: ",
-                        Int.toString (#fail summary),
-                        ", ",
-                        "Errors: ",
-                        Int.toString (#errors summary),
-                        ", ",
-                        (* "Skipped: ", #skipped summary, " ", *)
-                        "Time elapsed: ", intervalToString dt,
-                        " - in ", new_path,
-                        "\n"]))
-      end;
-  
-  val report = report_iter "";
+  val report = print o (report_iter "");
+
+  val report_all = app report;
 end;
