@@ -1,4 +1,3 @@
-
 (* 
 Print to the terminal (hence the "-Tt" suffix) a summary of test
 results in the style of JUnit.
@@ -7,12 +6,11 @@ If any failures or errors occur, print those out with a bit more
 detail.
 *)
 structure JUnitTt :> REPORTER = struct
-  type t = unit;
   structure Result = Test.Result;
 
   fun interval_to_string (dt : Time.time) =
     (LargeInt.toString (Time.toMicroseconds dt))^"ms";
-  
+
   fun report_iter p =
     let
       fun for_case c =
@@ -52,3 +50,4 @@ structure JUnitTt :> REPORTER = struct
 
   val report_all = app report;
 end;
+

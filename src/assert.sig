@@ -1,6 +1,7 @@
 signature ASSERT = sig
   exception Failure of string;
 
-  val !! : string -> bool -> unit;
-  val eq : ''a * ''a * string -> unit;
+  val !! : bool -> string -> unit;
+  val eq : ''a -> ''a -> string -> unit;
 end;
+

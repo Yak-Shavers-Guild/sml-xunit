@@ -7,3 +7,4 @@ for pointless bureacracy.
 signature SUITE = sig
   val suite : Test.t;
 end;
+

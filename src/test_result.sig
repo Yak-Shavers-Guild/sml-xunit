@@ -1,3 +1,7 @@
+(*
+TODO: capture everything printed to stdout and stderr, then
+allow the user access to these strings.
+*)
 signature TEST_RESULT = sig
   type t;
   val for_case : string -> (unit -> unit) -> t;
@@ -22,3 +26,4 @@ signature TEST_RESULT = sig
   val count_errors : t -> int;
   val count_total : t -> int;
 end;
+

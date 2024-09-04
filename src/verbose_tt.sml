@@ -2,9 +2,7 @@
 Write every test result to the terminal. It's very...verbose...
 *)
 structure VerboseTt :> REPORTER = struct
-  type t = unit;
   structure Result = Test.Result;
-
 
   fun interval_to_string (dt : Time.time) : string =
     (LargeInt.toString (Time.toMicroseconds dt))^"ms";
@@ -51,3 +49,4 @@ structure VerboseTt :> REPORTER = struct
   val report_all = app report;
 
 end;
+

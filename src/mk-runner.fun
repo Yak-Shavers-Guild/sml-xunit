@@ -12,3 +12,4 @@ functor MkRunner(Reporter : REPORTER) :> RUNNER = struct
       ()
     end;
 end;
+

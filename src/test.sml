@@ -4,12 +4,12 @@ structure Test :> TEST = struct
   type t = Test;
   structure Result : TEST_RESULT = TestResult;
 
-  val all : (Test list) ref = ref [];
-
-  fun suite name tests = Suite(name, tests);
-
   fun new name f = Case(name,f);
   
+  fun suite name tests = Suite(name, tests);
+
+  val all : (Test list) ref = ref [];
+
   fun register_suite name tests =
     let
       val s = suite name tests
@@ -17,7 +17,15 @@ structure Test :> TEST = struct
       all := s::(!all);
       s
     end;
-  
+
+  fun run (Case (name, assertion)) =
+      Result.for_case name assertion
+    | run (Suite (name, tests)) =
+      Result.for_suite name
+                       (fn () => map run tests);
+
+  fun run_all () = map run (!all);
+
 (*
 The "path" refers to relative positioning of a test within the
 hierarchy of suites. It's use is for looking up failing tests.
@@ -34,17 +42,11 @@ name to it, the path is "just" that new name.
                     then p ^ name
                     else (p ^ "." ^ name);
 
-  fun run (Case (name, assertion)) =
-      Result.for_case name assertion
-    | run (Suite (name, tests)) =
-      Result.for_suite name
-                       (fn () => map run tests);
-  
-  fun run_all () = map run (!all);
-
   (* Exit successfully iff all tests are successful. *)
   fun exit_status results =
     if List.all Result.is_success results
     then OS.Process.success
     else OS.Process.failure;
+
 end;
+

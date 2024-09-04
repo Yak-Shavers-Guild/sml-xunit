@@ -6,8 +6,6 @@ structure TestResult :> TEST_RESULT = struct
   datatype t = Case of string * Time.time * Outcome
              | Suite of string * Time.time * (t list);
 
-(* *** smart constructors *** *)
-  
   fun for_case name assertion =
     let
       val start = Time.now();
@@ -57,7 +55,7 @@ How long did it take just to run the test(s)? *)
                 (Time.+)(dt, realtime result))
             (realtime r)
             rs;
-  
+
   fun count_successes (Case (_,_,Success)) = 1
     | count_successes (Case _) = 0 
     | count_successes (Suite (_,_,outcomes)) =
@@ -88,18 +86,16 @@ How long did it take just to run the test(s)? *)
     | is_error (s as Suite _) =
       (count_errors s) > 0;
 
-  fun interval_to_string (dt : Time.time) =
-    (LargeInt.toString (Time.toMicroseconds dt))^"ms";
-
-  fun report case_report suite_report =
-    fn (c as Case _) => case_report c
-    | (s as Suite (_,_,results)) =>
-      suite_report s results;
-
   fun msg (Case (_,_,Failure msg)) = msg
     | msg _ = "";
 
   fun exn_message (Case (_,_,Error e)) = exnMessage e
     | exn_message _ = ""; 
 
+  fun report case_report suite_report =
+    fn (c as Case _) => case_report c
+    | (s as Suite (_,_,results)) =>
+      suite_report s results;
+
 end;
+

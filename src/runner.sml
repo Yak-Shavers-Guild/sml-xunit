@@ -10,3 +10,4 @@ For inspecting per test result, VerboseTt.report may be useful
 structure Runner :> RUNNER = MkRunner(JUnitTt);
 
 val main = Runner.run;
+
