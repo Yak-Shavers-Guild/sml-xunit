@@ -6,8 +6,9 @@ Basically: you will write `SUITE` structures, and use
 `Test.register_suite` to register the tests with the test runner.
 
 A test case usually is constructed with `Test.new name (fn () => ...)`
-where the anonymous function will invoke `Assert.!! msg_on_fail test_result`
-or `Assert.eq(expected,actual,fail_msg)`.
+where the anonymous function will invoke `Assert.!! test_result msg_on_fail`
+or `Assert.eq expected actual fail_msg`. (The failure message is
+always the last argument to assertions.)
 
 Test suites are lists of tests, formed by `Test.suite name test_list`.
 

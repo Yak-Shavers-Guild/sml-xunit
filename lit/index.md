@@ -100,7 +100,7 @@ grasp towards are files and folders).
 
 In effect, we want to be able to write down tests like:
 
-```sml*
+```sml {example}
 test "lowercase_test1"
      (fn () =>
        let
