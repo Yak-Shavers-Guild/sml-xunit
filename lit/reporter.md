@@ -1,6 +1,12 @@
 ---
 title: Reporter Module
 ---
+<nav class="crumbs">
+- [ysg](../index.html)
+- [sml](../sml/index.html)
+- [xunit](./index.html)
+- reporter
+</nav>
 
 # Test Reporter
 

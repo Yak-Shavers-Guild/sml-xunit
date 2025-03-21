@@ -1,6 +1,12 @@
 ---
 title: Test architecture
 ---
+<nav class="crumbs">
+- [ysg](../index.html)
+- [sml](../sml/index.html)
+- [xunit](./index.html)
+- test
+</nav>
 
 # Test architecture
 
