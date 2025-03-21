@@ -1,0 +1,326 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width" />
+<title>Reporter Module</title>
+<link type="text/css" rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+
+<!-- The loading of KaTeX is deferred to speed up page rendering -->
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+
+<!-- To automatically render math in text elements, include the auto-render extension: -->
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"
+onload="renderMathInElement(document.body);"></script>
+<script>
+    // https://github.com/KaTeX/KaTeX/blob/main/docs/autorender.md
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            // customised options
+            // auto-render specific keys, e.g.:
+                delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true},
+                {left: "\begin{equation}", right: "\end{equation}", display: true},
+                {left: "\begin{align}", right: "\end{align}", display: true},
+            ],
+            // rendering keys, e.g.:
+            throwOnError : false
+        });
+    });
+ </script>
+
+</head>
+<body>
+<main>
+
+<p>
+<nav class="crumbs">
+</p>
+
+<ul><li>
+<p>
+<a href="../index.html">ysg</a>
+</p>
+</li>
+<li>
+<p>
+<a href="../sml/index.html">sml</a>
+</p>
+</li>
+<li>
+<p>
+<a href="./index.html">xunit</a>
+</p>
+</li>
+<li>
+<p>
+reporter
+</p>
+</li>
+</ul>
+
+<p>
+</nav>
+</p>
+
+<h1>Test Reporter</h1>
+
+<h2>Specification</h2>
+
+<p>
+A reporter will take a <code>TestResult.t</code>, then write a human-readable
+report to the screen (or to a file, or send an email, or send a text
+message, or post a viral Tik Tok video, or&hellip;). In effect, it will
+<code>report</code> a test result.
+</p>
+
+<p>
+Furthermore, if the <code>report</code> creates a new file, writes to it, then
+closes it (or posts a new TikTok video, or sends an email, or&hellip;),
+well what happens if it reports a sequence of test results? We'd get a
+bunch of emails, or files, or TikTok videos, or&hellip;, when it'd be more
+desirable to get <b>just one</b> artifact.
+</p>
+
+<p>
+For this reason, we will add a <code>report_all</code> function to produce just
+one artifact for a list of test results.
+</p>
+
+<pre data-lang="sml" class="src">(*
+The REPORTER formats and writes the results...somewhere.
+This could be to the screen (usually done by reporters
+suffixed by `_Tt`) or to a file.
+
+Either way, this is a `unit` return type.
+
+The reason for `report_all` as separate than `report` is
+because `report` could create a new file each time it is
+called (which might be undesirable if we want to write all the
+results to a single file).
+*)
+signature REPORTER = sig
+  val report : Test.Result.t -&gt; unit;
+  val report_all : Test.Result.t list -&gt; unit;
+end;</pre>
+
+<h2>JUnit-like reporter printing to the terminal</h2>
+
+<p>
+We sometimes only want to know about failures or errors which
+occurred, and then a summary for each test suite of the total number
+of tests run. This is what JUnit does, so I just copied its format.
+</p>
+
+<p>
+We begin with some helper functions for printing the time interval to
+microseconds.
+</p>
+
+<pre data-lang="sml" class="src">
+(* 
+Print to the terminal (hence the &quot;-Tt&quot; suffix) a summary of test
+results in the style of JUnit.
+
+If any failures or errors occur, print those out with a bit more
+detail.
+*)
+structure JUnitTt :&gt; REPORTER = struct
+  structure Result = Test.Result;
+
+  fun interval_to_string (dt : Time.time) =
+    (LargeInt.toString (Time.toMicroseconds dt))^&quot;ms&quot;;</pre>
+
+<p>
+The basic recursive scheme will be to carry the "path" to the test
+suite containing the current test result. Then we have two possible
+situations:
+</p>
+
+<ol><li>
+<p>
+We are reporting the result for a test case. 
+</p>
+
+<ul><li>
+<p>
+If the test failed, we should print the path to the test,
+announce it failed, and give the failure message.
+</p>
+</li>
+<li>
+<p>
+If the test err'd, we should do everything similarly to the
+failure case, except announce it was an <code>ERROR</code> and produce the
+exception message.
+</p>
+</li>
+<li>
+<p>
+If the test succeeded, then don't do anything: we do not wish to
+pollute the terminal.
+</p>
+</li>
+</ul>
+</li>
+<li>
+<p>
+We are reporting the result for a test suite.
+</p>
+
+<ul><li>
+<p>
+Write the test suite's full path to the screen.
+</p>
+</li>
+<li>
+<p>
+Write the results for each test in the suite to the screen.
+</p>
+</li>
+<li>
+<p>
+Write to the screen a summary line counting the total number of
+tests run, the number of failures, the number of errors, and the
+name of the test suite.
+</p>
+</li>
+</ul>
+</li>
+</ol>
+
+<p>
+These are precisely the <code>report_case</code> and <code>report_suite</code> functions
+which will be given to <code>TestResult.report</code>.
+</p>
+
+<pre data-lang="sml" class="src">  fun report_iter p =
+    let
+      fun for_case c =
+        if Result.is_failure c
+        then concat [Test.path p (Result.name c),
+                     &quot; FAIL: &quot;,
+                     Result.msg c,
+                     &quot;&bsol;&#xfeff;n&quot;]
+        else if Result.is_error c
+        then concat [Test.path p (Result.name c),
+                     &quot; ERROR: &quot;,
+                     (Result.exn_message c),
+                     &quot;&bsol;&#xfeff;n&quot;]
+        else &quot;&quot;;
+      fun for_suite result rs =
+        let
+          val p2 = Test.path p (Result.name result);
+        in
+          concat [&quot;Running &quot;, p2, &quot;&bsol;&#xfeff;n&quot;,
+                  concat (map (report_iter p2) rs),
+                  &quot;Tests run: &quot;,
+                  Int.toString(Result.count_total result),
+                  &quot;, Failures: &quot;,
+                  Int.toString(Result.count_failures result),
+                  &quot;, Errors: &quot;,
+                  Int.toString(Result.count_errors result),
+                  &quot;, Time elapsed: &quot;,
+                  interval_to_string (Result.realtime result),
+                  &quot; - in &quot;,
+                  (Result.name result), &quot;&bsol;&#xfeff;n&quot;]
+        end;
+    in
+      fn result =&gt; Result.report for_case for_suite result
+    end;</pre>
+
+<p>
+The <code>report</code> function just prints the string we just constructed to
+the screen. The <code>report_all</code> prints all the results to the screen.
+</p>
+
+<p>
+That's all there is to the JUnit-teletype reporter.
+</p>
+
+<pre data-lang="sml" class="src">  val report = print o (report_iter &quot;&quot;);
+
+  val report_all = app report;
+end;</pre>
+
+<h2>Verbose Reporter</h2>
+
+<p>
+The verbose reporter is similar to the JUnit teletype reporter, but it
+reports <i>successes</i> as well as failures and errors.
+</p>
+
+<pre data-lang="sml" class="src">(*
+Write every test result to the terminal. It&apos;s very...verbose...
+*)
+structure VerboseTt :&gt; REPORTER = struct
+  structure Result = Test.Result;
+
+  fun interval_to_string (dt : Time.time) : string =
+    (LargeInt.toString (Time.toMicroseconds dt))^&quot;ms&quot;;
+
+  (* Print the results to the terminal *)
+  fun report_iter p =
+    let
+      fun for_case c =
+        if Result.is_failure c
+        then concat [Test.path p (Result.name c),
+                     &quot; FAIL: &quot;,
+                     Result.msg c,
+                     &quot;&bsol;&#xfeff;n&quot;]
+        else if Result.is_error c
+        then concat [Test.path p (Result.name c),
+                     &quot; ERROR: &quot;,
+                     (Result.exn_message c),
+                     &quot;&bsol;&#xfeff;n&quot;]
+        else concat [Test.path p (Result.name c),
+                     &quot; SUCCESS&bsol;&#xfeff;n&quot;];
+      fun for_suite result rs =
+        let
+          val p2 = Test.path p (Result.name result);
+        in
+          concat [&quot;Running &quot;, p2, &quot;&bsol;&#xfeff;n&quot;,
+                  concat (map (report_iter p2) rs),
+                  &quot;Tests run: &quot;,
+                  Int.toString(Result.count_total result),
+                  &quot;, Failures: &quot;,
+                  Int.toString(Result.count_failures result),
+                  &quot;, Errors: &quot;,
+                  Int.toString(Result.count_errors result),
+                  &quot;, Time elapsed: &quot;,
+                  interval_to_string (Result.realtime result),
+                  &quot; - in &quot;,
+                  (Result.name result), &quot;&bsol;&#xfeff;n&quot;]
+        end;
+    in
+      fn result =&gt; Result.report for_case for_suite result
+    end;
+
+  val report = print o (report_iter &quot;&quot;);
+
+  val report_all = app report;
+
+end;</pre>
+
+<p>
+<footer>
+</p>
+
+<p>
+<b>[</b>
+<a href="./test-result.html">Back</a> <b>|</b> <a href="./index.html">Up</a> <b>|</b> <a href="./runner.html">Next</a>
+<b>]</b>
+</p>
+
+<p>
+</footer>
+</p>
+
+</main>
+
+</body>
+</html>

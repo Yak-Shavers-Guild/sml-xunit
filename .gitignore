@@ -1,0 +1,9 @@
+# Ignore autosave files
+*~
+
+# Ignore everything except HTML files
+*
+!*.html
+!.gitignore
+
+# md --katex --css ../css --output ./ --r lit/

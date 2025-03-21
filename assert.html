@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width" />
+<title>Assertions</title>
+<link type="text/css" rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+
+<!-- The loading of KaTeX is deferred to speed up page rendering -->
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+
+<!-- To automatically render math in text elements, include the auto-render extension: -->
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"
+onload="renderMathInElement(document.body);"></script>
+<script>
+    // https://github.com/KaTeX/KaTeX/blob/main/docs/autorender.md
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            // customised options
+            // auto-render specific keys, e.g.:
+                delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true},
+                {left: "\begin{equation}", right: "\end{equation}", display: true},
+                {left: "\begin{align}", right: "\end{align}", display: true},
+            ],
+            // rendering keys, e.g.:
+            throwOnError : false
+        });
+    });
+ </script>
+
+</head>
+<body>
+<main>
+
+<p>
+<nav class="crumbs">
+</p>
+
+<ul><li>
+<p>
+<a href="../index.html">ysg</a>
+</p>
+</li>
+<li>
+<p>
+<a href="../sml/index.html">sml</a>
+</p>
+</li>
+<li>
+<p>
+<a href="./index.html">xunit</a>
+</p>
+</li>
+<li>
+<p>
+assert
+</p>
+</li>
+</ul>
+
+<p>
+</nav>
+</p>
+
+<h1>Assertions</h1>
+
+<p>
+The basic idea is that we want to have tests raise a special exception
+if the assertion fails to be true, which will be handled by the
+<code>Test.run</code> function and processed to a <code>Test.Result.Failure</code>. Further,
+we want this to have a message communicating the <i>reason</i> for failure.
+</p>
+
+<p>
+This is achieved with a simple module packaging a <code>Failure</code>
+exception. We don't want to re-use to given <code>Fail</code> exception from the
+Standard ML standard library, since the system under test might throw
+that exception (and then how do we determine if this is an "assert
+fail" or a "system-under-test fail"?). We avoid this problem with an
+<code>Assert.Failure</code> exception.
+</p>
+
+<p>
+We also want two simple helper functions:
+</p>
+
+<ul><li>
+<p>
+one (<code>Assert.!!</code>) will take a Boolean value representing whether we
+succeeded or failed (and a failure message to report upon failure);
+</p>
+</li>
+<li>
+<p>
+the other will <code>Assert.eq</code> take two values (an <code>actual</code> and an
+<code>expected</code> value) and a fail message, then if the two values are
+<b>not</b> equal to each other <code>raise Failure msg</code>.
+</p>
+</li>
+</ul>
+
+<p>
+A good practice is to have consistent argument ordering: the failure
+message should always be first or always be last &mdash; it doesn't
+matter which convention is chosen, but one should be chosen. 
+</p>
+
+<p>
+Since the heuristic we should bear in mind is "Assert [condition],
+otherwise here's the reason why it failed", it makes sense to give the
+failure message as the <i>last</i> argument.
+</p>
+
+<p>
+The signature for this plan is:
+</p>
+
+<pre data-lang="sml" class="src">signature ASSERT = sig
+  exception Failure of string;
+
+  val !! : bool -&gt; string -&gt; unit;
+  val eq : &apos;&apos;a -&gt; &apos;&apos;a -&gt; string -&gt; unit;
+end;</pre>
+
+<p>
+The implementation for this plan is equally as simple:
+</p>
+
+<pre data-lang="sml" class="src">structure Assert :&gt; ASSERT = struct
+  exception Failure of string;
+
+  fun !! is_success msg =
+    if is_success then ()
+    else raise Failure msg;
+
+  fun eq expected actual msg =
+    !! (expected = actual) msg;
+end;</pre>
+
+<p>
+<footer>
+</p>
+
+<p>
+<b>[</b> <a href="./index.html">Up</a> <b>|</b> <a href="./test.html">Next</a> <b>]</b>
+</p>
+
+<p>
+</footer>
+</p>
+
+</main>
+
+</body>
+</html>

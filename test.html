@@ -1,0 +1,367 @@
+<!doctype html>
+<html lang="en-US">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width" />
+<title>Test architecture</title>
+<link type="text/css" rel="stylesheet" href="../css/style.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css" integrity="sha384-nB0miv6/jRmo5UMMR1wu3Gz6NLsoTkbqJghGIsx//Rlm+ZU03BU6SQNC66uf4l5+" crossorigin="anonymous">
+
+<!-- The loading of KaTeX is deferred to speed up page rendering -->
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js" integrity="sha384-7zkQWkzuo3B5mTepMUcHkMB5jZaolc2xDwL6VFqjFALcbeS9Ggm/Yr2r3Dy4lfFg" crossorigin="anonymous"></script>
+
+<!-- To automatically render math in text elements, include the auto-render extension: -->
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js" integrity="sha384-43gviWU0YVjaDtb/GhzOouOXtZMP/7XUzwPTstBeZFe/+rCMvRwr4yROQP43s0Xk" crossorigin="anonymous"
+onload="renderMathInElement(document.body);"></script>
+<script>
+    // https://github.com/KaTeX/KaTeX/blob/main/docs/autorender.md
+    document.addEventListener("DOMContentLoaded", function() {
+        renderMathInElement(document.body, {
+            // customised options
+            // auto-render specific keys, e.g.:
+                delimiters: [
+                {left: '$$', right: '$$', display: true},
+                {left: '$', right: '$', display: false},
+                {left: '\\(', right: '\\)', display: false},
+                {left: '\\[', right: '\\]', display: true},
+                {left: "\begin{equation}", right: "\end{equation}", display: true},
+                {left: "\begin{align}", right: "\end{align}", display: true},
+            ],
+            // rendering keys, e.g.:
+            throwOnError : false
+        });
+    });
+ </script>
+
+</head>
+<body>
+<main>
+
+<p>
+<nav class="crumbs">
+</p>
+
+<ul><li>
+<p>
+<a href="../index.html">ysg</a>
+</p>
+</li>
+<li>
+<p>
+<a href="../sml/index.html">sml</a>
+</p>
+</li>
+<li>
+<p>
+<a href="./index.html">xunit</a>
+</p>
+</li>
+<li>
+<p>
+test
+</p>
+</li>
+</ul>
+
+<p>
+</nav>
+</p>
+
+<h1>Test architecture</h1>
+
+<p>
+The basic architecture for xUnit testing consists of:
+</p>
+
+<ul><li>
+<p>
+Tests, which are either "test cases" or "test suites"
+</p>
+</li>
+<li>
+<p>
+Running tests, which takes a test then executes each test case,
+finally producing a "result" (a "result" being the data describing a
+<i>particular</i> "run")
+</p>
+</li>
+<li>
+<p>
+Reporting results (printing to the screen, writing to a file)
+</p>
+</li>
+</ul>
+
+<p>
+We want to design a simple library with this architecture.
+</p>
+
+<p>
+There are many "obvious" simple extensions to this library &mdash; the
+user may wish to write the output as an XML file, and capture the
+<code>stdout</code> (and/or <code>stderr</code>) stream(s), and so on. All these desired
+qualities are simple, straightforward, and reasonable requests. But
+designing software that will support <i>every</i> simple, straightforward,
+and reasonable request <i>prior</i> to the request being made is an
+exercise in futility: the reader is recommended to consult
+Laura Numeroff's <i>If You Give a Mouse a Cookie</i>.
+</p>
+
+<p>
+Now, we will suppose that a test case is just a name (string) and a
+function which if executed successfully produces the unit value <code>()</code>. 
+This function is precisely the four-phases of a unit test represented
+as an ML function. So if there is an assertion failure, an
+<code>Assert.Failure reason</code> exception is raised &mdash; which will be handled
+here.
+</p>
+
+<p>
+And a test suite is "just" a collection of tests labeled with a name
+(string). 
+</p>
+
+<p>
+Taken together, these form a recursive algebraic data type describing
+tests:
+</p>
+
+<pre data-lang="sml" class="src">structure Test :&gt; TEST = struct
+  datatype Test = Case of string*(unit -&gt; unit)
+                | Suite of string*(Test list);
+  type t = Test;
+  structure Result : TEST_RESULT = TestResult;</pre>
+
+<p>
+Why do we have this redundant <code>type t = Test</code>? Well, the signature for
+the <code>Test</code> lists function specifications, and it's easier to parse
+<code>Test -&gt; string</code> rather than <code>t -&gt; string</code> &mdash; and in general we want
+to <i>help</i> the reader make sense of our code.
+</p>
+
+<p>
+The <code>structure Result</code> is the test result module describing the
+associated abstract data type. We will discuss it in a moment.
+</p>
+
+<h2>Specification for Test Module</h2>
+
+<p>
+What exactly do we expect in a signature describing the specification
+for a <code>Test</code> module?
+</p>
+
+<p>
+We want:
+</p>
+
+<ul><li>
+<p>
+smart constructors <code>Test.new</code> for creating new test cases and
+<code>Test.suite</code> for creating new test suites
+</p>
+</li>
+<li>
+<p>
+<code>Test.register_suite</code> will create a new test suite, and register it
+with the test runner
+</p>
+</li>
+<li>
+<p>
+<code>Test.run_all : unit -&gt; TestResult.t list</code> will run all the tests
+and produce the associated result artifacts (which will later be
+reported to the reader)
+</p>
+</li>
+<li>
+<p>
+<code>Test.path</code> is a pretty printer for helping locate a unit test
+inside nested test suites
+</p>
+</li>
+<li>
+<p>
+<code>Test.exit_status</code> determines if there was any test failure or
+error, and only if there are no failures and no errors will we exit
+the program successfully.
+</p>
+</li>
+</ul>
+
+<p>
+We formalize this with the signature:
+</p>
+
+<pre data-lang="sml" class="src">signature TEST = sig
+  type Test;
+  type t = Test;
+  structure Result : TEST_RESULT;
+
+  val suite : string -&gt; Test list -&gt; Test;
+  val new : string -&gt; (unit -&gt; unit) -&gt; Test;
+  val register_suite : string -&gt; Test list -&gt; Test;
+  val run_all : unit -&gt; Result.t list;
+  val path : string -&gt; string -&gt; string;
+  val exit_status : Result.t list -&gt; OS.Process.status;
+end;</pre>
+
+<p>
+Let us implement these in order.
+</p>
+
+<h2>Smart constructors</h2>
+
+<p>
+We can implement the first couple smart constructors in the "obvious"
+way:
+</p>
+
+<pre data-lang="sml" class="src">  fun new name f = Case(name,f);
+  
+  fun suite name tests = Suite(name, tests);</pre>
+
+<p>
+Now we can register a suite to make it run by the "main" function at
+the end of our literate program. Towards that end, we need a variable
+tracking all the test suites to be run.
+</p>
+
+<p>
+I'm lazy, I gave up being clever and decided to use a mutable
+reference. Registering a suite simply creates a new test suite, pushes
+it on top of this mutable reference, then returns the test suite.
+</p>
+
+<pre data-lang="sml" class="src">  val all : (Test list) ref = ref [];
+
+  fun register_suite name tests =
+    let
+      val s = suite name tests
+    in
+      all := s::(!all);
+      s
+    end;</pre>
+
+<h2>Running tests</h2>
+
+<p>
+We will construct test results for each test suite, which recursively
+constructs new results for each test in the suite. The <code>TestResult</code>
+module will take care of executing a test <i>once</i>, and store the result
+of that particular execution.
+</p>
+
+<p>
+This means that <code>Test.run</code> will take a <code>Test.t</code> object, and produce a
+<code>TestResult.t</code> object describing what happened when we performed the
+test. The hard work will be found in the <code>TestResult.for_case</code> and
+<code>TestResult.for_suite</code> constructors.
+</p>
+
+<p>
+This pushes off the hard work to another module, but that's a common
+trick in programming (in politics it's called "delegation").
+</p>
+
+<pre data-lang="sml" class="src">  fun run (Case (name, assertion)) =
+      Result.for_case name assertion
+    | run (Suite (name, tests)) =
+      Result.for_suite name
+                       (fn () =&gt; map run tests);</pre>
+
+<p>
+We have a publicly available function which will produce the test
+results obtained by running all suites registered with the test
+runner.
+</p>
+
+<pre data-lang="sml" class="src">  fun run_all () = map run (!all);</pre>
+
+<h2>Path to a test</h2>
+
+<p>
+The "path" of a test is an idiosyncratic notion useful for helping us
+locate a failing unit test when it is in a deeply nested test suite.
+</p>
+
+<p>
+The analogy is with the "path" to a file [test] in a directory [suite].
+</p>
+
+<pre data-lang="sml" class="src">(*
+The &quot;path&quot; refers to relative positioning of a test within the
+hierarchy of suites. It&apos;s use is for looking up failing tests.
+
+If a suite ends with a &apos;/&apos;, then it is treated as a separator.
+
+Otherwise the default separator is a dot &quot;.&quot;.
+
+Empty paths are treated as empty strings, and when we append a
+name to it, the path is &quot;just&quot; that new name.
+*)
+  fun path &quot;&quot; name = name
+    | path p name = if String.isSuffix &quot;/&quot; p
+                    then p ^ name
+                    else (p ^ &quot;.&quot; ^ name);</pre>
+
+<h2>Determine Exit Status</h2>
+
+<p>
+The last step in the game is to determine the exit status &mdash; the
+program will indicate to the world if the tests ran successfully or if
+there was a failure (or error) encountered.
+</p>
+
+<p>
+This can be done by simply checking that all test results are recorded
+as all "successes".
+</p>
+
+<pre data-lang="sml" class="src">  (* Exit successfully iff all tests are successful. *)
+  fun exit_status results =
+    if List.all Result.is_success results
+    then OS.Process.success
+    else OS.Process.failure;</pre>
+
+<p>
+&hellip;and that's all! The <code>Test</code> module closes here, and we're off to the
+next exciting portion
+</p>
+
+<pre data-lang="sml" class="src">end;</pre>
+
+<h1>Appendix: Busywork for encapsulation</h1>
+
+<p>
+SML/NJ requires everything to be in a module, so we need to bundle a
+test suite as a module when we're writing unit tests. It must have a
+signature, so we give it a simple one:
+</p>
+
+<pre data-lang="sml" class="src">(*
+SML/NJ requires putting everything into structures, so
+when we have a test suite, we need to put it into a structure
+for pointless bureacracy.
+*)
+
+signature SUITE = sig
+  val suite : Test.t;
+end;</pre>
+
+<p>
+<footer>
+</p>
+
+<p>
+<b>[</b> <a href="./assert.html">Back</a> <b>|</b> <a href="./index.html">Up</a> <b>|</b> <a href="./test-result.html">Next</a> <b>]</b>
+</p>
+
+<p>
+</footer>
+</p>
+
+</main>
+
+</body>
+</html>
