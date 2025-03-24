@@ -201,6 +201,7 @@ We formalize this with the signature:
   val suite : string -&gt; Test list -&gt; Test;
   val new : string -&gt; (unit -&gt; unit) -&gt; Test;
   val register_suite : string -&gt; Test list -&gt; Test;
+  val run : Test -&gt; Result.t;
   val run_all : unit -&gt; Result.t list;
   val path : string -&gt; string -&gt; string;
   val exit_status : Result.t list -&gt; OS.Process.status;

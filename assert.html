@@ -128,18 +128,74 @@ The signature for this plan is:
 end;</pre>
 
 <p>
+<details class="spec">
+<summary>Tests for Assertions</summary>
+</p>
+
+<p>
+As an example of "test-driven development", we should provide some
+<i>specification</i> for these two functions <code>Assert.!!</code> and <code>Assert.eq</code>.
+</p>
+
+<p>
+We would expect <code>Assert.!! true &quot;true should not fail&quot; = ()</code>, so we
+can make this into a unit test.
+</p>
+
+<p>
+Similarly, we expect <code>Assert.!! false &quot;false fails&quot;</code> should throw an
+<code>Assert.Failure &quot;false fails&quot;</code> exception.
+</p>
+
+<pre data-lang="sml" class="src">structure AssertTest : SUITE = struct
+  val assert_bangbang_true_test =
+    Test.new &quot;assert_bangbang_true_test&quot;
+             (fn () =&gt;
+                 Assert.!! true &quot;true should not fail&quot;);
+
+  val assert_bangbang_false_test =
+    Test.new &quot;assert_bangbang_false_test&quot;
+             (fn () =&gt;
+                 let
+                   val msg = &quot;false fails&quot;;
+                 in
+                   Assert.!! false msg
+                   handle (Assert.Failure s) =&gt;
+                          Assert.eq msg s (&quot;EXPECTED: &quot; ^
+                                           msg ^
+                                           &quot;&bsol;&#xfeff;nACTUAL: &quot; ^
+                                           s ^
+                                           &quot;&bsol;&#xfeff;n&quot;)
+                 end);
+
+  val suite = Test.suite &quot;assert_test&quot; [
+      assert_bangbang_true_test
+    , assert_bangbang_false_test
+    ];
+end;</pre>
+
+<p>
+The <code>Assert.eq</code> function is just an abbreviation for <code>Assert.!!</code>, so
+there's no need to test it.
+</p>
+
+<p>
+</details>
+</p>
+
+<p>
 The implementation for this plan is equally as simple:
 </p>
 
 <pre data-lang="sml" class="src">structure Assert :&gt; ASSERT = struct
   exception Failure of string;
 
-  fun !! is_success msg =
+  fun !! is_success fail_msg =
     if is_success then ()
-    else raise Failure msg;
+    else raise Failure fail_msg;
 
-  fun eq expected actual msg =
-    !! (expected = actual) msg;
+  fun eq expected actual fail_msg =
+    !! (expected = actual) fail_msg;
 end;</pre>
 
 <p>

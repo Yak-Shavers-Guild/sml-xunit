@@ -238,6 +238,11 @@ interval it took to run, and that an "error" outcome with exception
 </li>
 </ul>
 
+<p>
+Strictly speaking, we could use a <a href="https://smlfamily.github.io/Basis/timer.html"><code>Timer</code></a>
+if we wanted to check the CPU time consumed.
+</p>
+
 <pre data-lang="sml" class="src">  fun for_case name assertion =
     let
       val start = Time.now();
