@@ -126,11 +126,11 @@ Taken together, these form a recursive algebraic data type describing
 tests:
 </p>
 
-<pre data-lang="sml" class="src">structure Test :&gt; TEST = struct
-  datatype Test = Case of string*(unit -&gt; unit)
-                | Suite of string*(Test list);
-  type t = Test;
-  structure Result : TEST_RESULT = TestResult;</pre>
+<pre data-lang="sml" class="src"><span class="k">structure</span> <span class="n">Test</span> <span class="n">:&gt;</span> <span class="n">TEST</span> <span class="n">=</span> <span class="k">struct</span>
+  <span class="k">datatype</span> <span class="n">Test</span> <span class="n">=</span> <span class="n">Case</span> <span class="k">of</span> <span class="n">string</span><span class="n">*</span><span class="p">(</span><span class="n">unit</span> <span class="n">-&gt;</span> <span class="n">unit</span><span class="p">)</span>
+                <span class="n">|</span> <span class="n">Suite</span> <span class="k">of</span> <span class="n">string</span><span class="n">*</span><span class="p">(</span><span class="n">Test</span> <span class="n">list</span><span class="p">)</span><span class="p">;</span>
+  <span class="k">type</span> <span class="n">t</span> <span class="n">=</span> <span class="n">Test</span><span class="p">;</span>
+  <span class="k">structure</span> <span class="n">Result</span> <span class="n">:</span> <span class="n">TEST_RESULT</span> <span class="n">=</span> <span class="n">TestResult</span><span class="p">;</span></pre>
 
 <p>
 Why do we have this redundant <code>type t = Test</code>? Well, the signature for
@@ -193,19 +193,19 @@ the program successfully.
 We formalize this with the signature:
 </p>
 
-<pre data-lang="sml" class="src">signature TEST = sig
-  type Test;
-  type t = Test;
-  structure Result : TEST_RESULT;
+<pre data-lang="sml" class="src"><span class="k">signature</span> <span class="n">TEST</span> <span class="n">=</span> <span class="k">sig</span>
+  <span class="k">type</span> <span class="n">Test</span><span class="p">;</span>
+  <span class="k">type</span> <span class="n">t</span> <span class="n">=</span> <span class="n">Test</span><span class="p">;</span>
+  <span class="k">structure</span> <span class="n">Result</span> <span class="n">:</span> <span class="n">TEST_RESULT</span><span class="p">;</span>
 
-  val suite : string -&gt; Test list -&gt; Test;
-  val new : string -&gt; (unit -&gt; unit) -&gt; Test;
-  val register_suite : string -&gt; Test list -&gt; Test;
-  val run : Test -&gt; Result.t;
-  val run_all : unit -&gt; Result.t list;
-  val path : string -&gt; string -&gt; string;
-  val exit_status : Result.t list -&gt; OS.Process.status;
-end;</pre>
+  <span class="k">val</span> <span class="n">suite</span> <span class="n">:</span> <span class="n">string</span> <span class="n">-&gt;</span> <span class="n">Test</span> <span class="n">list</span> <span class="n">-&gt;</span> <span class="n">Test</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">new</span> <span class="n">:</span> <span class="n">string</span> <span class="n">-&gt;</span> <span class="p">(</span><span class="n">unit</span> <span class="n">-&gt;</span> <span class="n">unit</span><span class="p">)</span> <span class="n">-&gt;</span> <span class="n">Test</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">register_suite</span> <span class="n">:</span> <span class="n">string</span> <span class="n">-&gt;</span> <span class="n">Test</span> <span class="n">list</span> <span class="n">-&gt;</span> <span class="n">Test</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">run</span> <span class="n">:</span> <span class="n">Test</span> <span class="n">-&gt;</span> <span class="n">Result</span>.<span class="n">t</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">run_all</span> <span class="n">:</span> <span class="n">unit</span> <span class="n">-&gt;</span> <span class="n">Result</span>.<span class="n">t</span> <span class="n">list</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">path</span> <span class="n">:</span> <span class="n">string</span> <span class="n">-&gt;</span> <span class="n">string</span> <span class="n">-&gt;</span> <span class="n">string</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">exit_status</span> <span class="n">:</span> <span class="n">Result</span>.<span class="n">t</span> <span class="n">list</span> <span class="n">-&gt;</span> <span class="n">OS</span>.<span class="n">Process</span>.<span class="n">status</span><span class="p">;</span>
+<span class="k">end</span><span class="p">;</span></pre>
 
 <p>
 Let us implement these in order.
@@ -218,9 +218,9 @@ We can implement the first couple smart constructors in the "obvious"
 way:
 </p>
 
-<pre data-lang="sml" class="src">  fun new name f = Case(name,f);
+<pre data-lang="sml" class="src">  <span class="k">fun</span> <span class="n">new</span> <span class="n">name</span> <span class="n">f</span> <span class="n">=</span> <span class="n">Case</span><span class="p">(</span><span class="n">name</span><span class="p">,</span><span class="n">f</span><span class="p">)</span><span class="p">;</span>
   
-  fun suite name tests = Suite(name, tests);</pre>
+  <span class="k">fun</span> <span class="n">suite</span> <span class="n">name</span> <span class="n">tests</span> <span class="n">=</span> <span class="n">Suite</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">tests</span><span class="p">)</span><span class="p">;</span></pre>
 
 <p>
 Now we can register a suite to make it run by the "main" function at
@@ -234,15 +234,15 @@ reference. Registering a suite simply creates a new test suite, pushes
 it on top of this mutable reference, then returns the test suite.
 </p>
 
-<pre data-lang="sml" class="src">  val all : (Test list) ref = ref [];
+<pre data-lang="sml" class="src">  <span class="k">val</span> <span class="n">all</span> <span class="n">:</span> <span class="p">(</span><span class="n">Test</span> <span class="n">list</span><span class="p">)</span> <span class="n">ref</span> <span class="n">=</span> <span class="n">ref</span> <span class="p">[</span><span class="p">]</span><span class="p">;</span>
 
-  fun register_suite name tests =
-    let
-      val s = suite name tests
-    in
-      all := s::(!all);
-      s
-    end;</pre>
+  <span class="k">fun</span> <span class="n">register_suite</span> <span class="n">name</span> <span class="n">tests</span> <span class="n">=</span>
+    <span class="k">let</span>
+      <span class="k">val</span> <span class="n">s</span> <span class="n">=</span> <span class="n">suite</span> <span class="n">name</span> <span class="n">tests</span>
+    <span class="k">in</span>
+      <span class="n">all</span> <span class="n">:=</span> <span class="n">s</span><span class="n">::</span><span class="p">(</span><span class="n">!</span><span class="n">all</span><span class="p">)</span><span class="p">;</span>
+      <span class="n">s</span>
+    <span class="k">end</span><span class="p">;</span></pre>
 
 <h2>Running tests</h2>
 
@@ -265,11 +265,11 @@ This pushes off the hard work to another module, but that's a common
 trick in programming (in politics it's called "delegation").
 </p>
 
-<pre data-lang="sml" class="src">  fun run (Case (name, assertion)) =
-      Result.for_case name assertion
-    | run (Suite (name, tests)) =
-      Result.for_suite name
-                       (fn () =&gt; map run tests);</pre>
+<pre data-lang="sml" class="src">  <span class="k">fun</span> <span class="n">run</span> <span class="p">(</span><span class="n">Case</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">assertion</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span>
+      <span class="n">Result</span>.<span class="n">for_case</span> <span class="n">name</span> <span class="n">assertion</span>
+    <span class="n">|</span> <span class="n">run</span> <span class="p">(</span><span class="n">Suite</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">tests</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span>
+      <span class="n">Result</span>.<span class="n">for_suite</span> <span class="n">name</span>
+                       <span class="p">(</span><span class="k">fn</span> <span class="p">(</span><span class="p">)</span> <span class="n">=&gt;</span> <span class="n">map</span> <span class="n">run</span> <span class="n">tests</span><span class="p">)</span><span class="p">;</span></pre>
 
 <p>
 We have a publicly available function which will produce the test
@@ -277,7 +277,7 @@ results obtained by running all suites registered with the test
 runner.
 </p>
 
-<pre data-lang="sml" class="src">  fun run_all () = map run (!all);</pre>
+<pre data-lang="sml" class="src">  <span class="k">fun</span> <span class="n">run_all</span> <span class="p">(</span><span class="p">)</span> <span class="n">=</span> <span class="n">map</span> <span class="n">run</span> <span class="p">(</span><span class="n">!</span><span class="n">all</span><span class="p">)</span><span class="p">;</span></pre>
 
 <h2>Path to a test</h2>
 
@@ -290,7 +290,7 @@ locate a failing unit test when it is in a deeply nested test suite.
 The analogy is with the "path" to a file [test] in a directory [suite].
 </p>
 
-<pre data-lang="sml" class="src">(*
+<pre data-lang="sml" class="src"><span class="c">(*
 The &quot;path&quot; refers to relative positioning of a test within the
 hierarchy of suites. It&apos;s use is for looking up failing tests.
 
@@ -300,11 +300,11 @@ Otherwise the default separator is a dot &quot;.&quot;.
 
 Empty paths are treated as empty strings, and when we append a
 name to it, the path is &quot;just&quot; that new name.
-*)
-  fun path &quot;&quot; name = name
-    | path p name = if String.isSuffix &quot;/&quot; p
-                    then p ^ name
-                    else (p ^ &quot;.&quot; ^ name);</pre>
+*)</span>
+  <span class="k">fun</span> <span class="n">path</span> <span class="s">&quot;&quot;</span> <span class="n">name</span> <span class="n">=</span> <span class="n">name</span>
+    <span class="n">|</span> <span class="n">path</span> <span class="n">p</span> <span class="n">name</span> <span class="n">=</span> <span class="k">if</span> <span class="n">String</span>.<span class="n">isSuffix</span> <span class="s">&quot;/&quot;</span> <span class="n">p</span>
+                    <span class="k">then</span> <span class="n">p</span> <span class="n">^</span> <span class="n">name</span>
+                    <span class="k">else</span> <span class="p">(</span><span class="n">p</span> <span class="n">^</span> <span class="s">&quot;.&quot;</span> <span class="n">^</span> <span class="n">name</span><span class="p">)</span><span class="p">;</span></pre>
 
 <h2>Determine Exit Status</h2>
 
@@ -319,18 +319,18 @@ This can be done by simply checking that all test results are recorded
 as all "successes".
 </p>
 
-<pre data-lang="sml" class="src">  (* Exit successfully iff all tests are successful. *)
-  fun exit_status results =
-    if List.all Result.is_success results
-    then OS.Process.success
-    else OS.Process.failure;</pre>
+<pre data-lang="sml" class="src">  <span class="c">(* Exit successfully iff all tests are successful. *)</span>
+  <span class="k">fun</span> <span class="n">exit_status</span> <span class="n">results</span> <span class="n">=</span>
+    <span class="k">if</span> <span class="n">List</span>.<span class="n">all</span> <span class="n">Result</span>.<span class="n">is_success</span> <span class="n">results</span>
+    <span class="k">then</span> <span class="n">OS</span>.<span class="n">Process</span>.<span class="n">success</span>
+    <span class="k">else</span> <span class="n">OS</span>.<span class="n">Process</span>.<span class="n">failure</span><span class="p">;</span></pre>
 
 <p>
 &hellip;and that's all! The <code>Test</code> module closes here, and we're off to the
 next exciting portion
 </p>
 
-<pre data-lang="sml" class="src">end;</pre>
+<pre data-lang="sml" class="src"><span class="k">end</span><span class="p">;</span></pre>
 
 <h1>Appendix: Busywork for encapsulation</h1>
 
@@ -340,15 +340,15 @@ test suite as a module when we're writing unit tests. It must have a
 signature, so we give it a simple one:
 </p>
 
-<pre data-lang="sml" class="src">(*
+<pre data-lang="sml" class="src"><span class="c">(*
 SML/NJ requires putting everything into structures, so
 when we have a test suite, we need to put it into a structure
 for pointless bureacracy.
-*)
+*)</span>
 
-signature SUITE = sig
-  val suite : Test.t;
-end;</pre>
+<span class="k">signature</span> <span class="n">SUITE</span> <span class="n">=</span> <span class="k">sig</span>
+  <span class="k">val</span> <span class="n">suite</span> <span class="n">:</span> <span class="n">Test</span>.<span class="n">t</span><span class="p">;</span>
+<span class="k">end</span><span class="p">;</span></pre>
 
 <p>
 <footer>

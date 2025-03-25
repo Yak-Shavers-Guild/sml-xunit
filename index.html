@@ -209,23 +209,23 @@ grasp towards are files and folders).
 In effect, we want to be able to write down tests like:
 </p>
 
-<pre data-lang="sml" class="example">test &quot;lowercase_test1&quot;
-     (fn () =&gt;
-       let
-         (* fixture setup (none) *)
-         (* exercise system *)
-         val actual = lowercase(&quot;ExPeCtEd OUTCOME&quot;);
-         (* verify outcome *)
-         val expected = &quot;expected outcome&quot;;
-         val fail_msg = concat [&quot;EXPECTED: &bsol;&#xfeff;&quot;&quot;
-                               , expected
-                               , &quot;&bsol;&#xfeff;&quot;&bsol;&#xfeff;nACTUAL: &bsol;&#xfeff;&quot;&quot;
-                               , actual
-                               , &quot;&bsol;&#xfeff;&quot;&bsol;&#xfeff;n&quot;];
-        in
-         Assert.eq expected actual fail_msg
-         (* fixture teardown (none) *)
-        end);</pre>
+<pre data-lang="sml" class="example"><span class="n">test</span> <span class="s">&quot;lowercase_test1&quot;</span>
+     <span class="p">(</span><span class="k">fn</span> <span class="p">(</span><span class="p">)</span> <span class="n">=&gt;</span>
+       <span class="k">let</span>
+         <span class="c">(* fixture setup (none) *)</span>
+         <span class="c">(* exercise system *)</span>
+         <span class="k">val</span> <span class="n">actual</span> <span class="n">=</span> <span class="n">lowercase</span><span class="p">(</span><span class="s">&quot;ExPeCtEd OUTCOME&quot;</span><span class="p">)</span><span class="p">;</span>
+         <span class="c">(* verify outcome *)</span>
+         <span class="k">val</span> <span class="n">expected</span> <span class="n">=</span> <span class="s">&quot;expected outcome&quot;</span><span class="p">;</span>
+         <span class="k">val</span> <span class="n">fail_msg</span> <span class="n">=</span> <span class="n">concat</span> <span class="p">[</span><span class="s">&quot;EXPECTED: &bsol;&#xfeff;&quot;&quot;</span>
+                               <span class="p">,</span> <span class="n">expected</span>
+                               <span class="p">,</span> <span class="s">&quot;&bsol;&#xfeff;&quot;&bsol;&#xfeff;nACTUAL: &bsol;&#xfeff;&quot;&quot;</span>
+                               <span class="p">,</span> <span class="n">actual</span>
+                               <span class="p">,</span> <span class="s">&quot;&bsol;&#xfeff;&quot;&bsol;&#xfeff;n&quot;</span><span class="p">]</span><span class="p">;</span>
+        <span class="k">in</span>
+         <span class="n">Assert</span>.<span class="n">eq</span> <span class="n">expected</span> <span class="n">actual</span> <span class="n">fail_msg</span>
+         <span class="c">(* fixture teardown (none) *)</span>
+        <span class="k">end</span><span class="p">)</span><span class="p">;</span></pre>
 
 <p>
 Fixtures occur when we want to have a "fake database" which stores

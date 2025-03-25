@@ -91,7 +91,7 @@ For this reason, we will add a <code>report_all</code> function to produce just
 one artifact for a list of test results.
 </p>
 
-<pre data-lang="sml" class="src">(*
+<pre data-lang="sml" class="src"><span class="c">(*
 The REPORTER formats and writes the results...somewhere.
 This could be to the screen (usually done by reporters
 suffixed by `_Tt`) or to a file.
@@ -102,11 +102,11 @@ The reason for `report_all` as separate than `report` is
 because `report` could create a new file each time it is
 called (which might be undesirable if we want to write all the
 results to a single file).
-*)
-signature REPORTER = sig
-  val report : Test.Result.t -&gt; unit;
-  val report_all : Test.Result.t list -&gt; unit;
-end;</pre>
+*)</span>
+<span class="k">signature</span> <span class="n">REPORTER</span> <span class="n">=</span> <span class="k">sig</span>
+  <span class="k">val</span> <span class="n">report</span> <span class="n">:</span> <span class="n">Test</span>.<span class="n">Result</span>.<span class="n">t</span> <span class="n">-&gt;</span> <span class="n">unit</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">report_all</span> <span class="n">:</span> <span class="n">Test</span>.<span class="n">Result</span>.<span class="n">t</span> <span class="n">list</span> <span class="n">-&gt;</span> <span class="n">unit</span><span class="p">;</span>
+<span class="k">end</span><span class="p">;</span></pre>
 
 <h2>JUnit-like reporter printing to the terminal</h2>
 
@@ -122,18 +122,18 @@ microseconds.
 </p>
 
 <pre data-lang="sml" class="src">
-(* 
+<span class="c">(* 
 Print to the terminal (hence the &quot;-Tt&quot; suffix) a summary of test
 results in the style of JUnit.
 
 If any failures or errors occur, print those out with a bit more
 detail.
-*)
-structure JUnitTt :&gt; REPORTER = struct
-  structure Result = Test.Result;
+*)</span>
+<span class="k">structure</span> <span class="n">JUnitTt</span> <span class="n">:&gt;</span> <span class="n">REPORTER</span> <span class="n">=</span> <span class="k">struct</span>
+  <span class="k">structure</span> <span class="n">Result</span> <span class="n">=</span> <span class="n">Test</span>.<span class="n">Result</span><span class="p">;</span>
 
-  fun interval_to_string (dt : Time.time) =
-    (LargeInt.toString (Time.toMicroseconds dt))^&quot;ms&quot;;</pre>
+  <span class="k">fun</span> <span class="n">interval_to_string</span> <span class="p">(</span><span class="n">dt</span> <span class="n">:</span> <span class="n">Time</span>.<span class="n">time</span><span class="p">)</span> <span class="n">=</span>
+    <span class="p">(</span><span class="n">LargeInt</span>.<span class="n">toString</span> <span class="p">(</span><span class="n">Time</span>.<span class="n">toMicroseconds</span> <span class="n">dt</span><span class="p">)</span><span class="p">)</span><span class="n">^</span><span class="s">&quot;ms&quot;</span><span class="p">;</span></pre>
 
 <p>
 The basic recursive scheme will be to carry the "path" to the test
@@ -198,40 +198,40 @@ These are precisely the <code>report_case</code> and <code>report_suite</code> f
 which will be given to <code>TestResult.report</code>.
 </p>
 
-<pre data-lang="sml" class="src">  fun report_iter p =
-    let
-      fun for_case c =
-        if Result.is_failure c
-        then concat [Test.path p (Result.name c),
-                     &quot; FAIL: &quot;,
-                     Result.msg c,
-                     &quot;&bsol;&#xfeff;n&quot;]
-        else if Result.is_error c
-        then concat [Test.path p (Result.name c),
-                     &quot; ERROR: &quot;,
-                     (Result.exn_message c),
-                     &quot;&bsol;&#xfeff;n&quot;]
-        else &quot;&quot;;
-      fun for_suite result rs =
-        let
-          val p2 = Test.path p (Result.name result);
-        in
-          concat [&quot;Running &quot;, p2, &quot;&bsol;&#xfeff;n&quot;,
-                  concat (map (report_iter p2) rs),
-                  &quot;Tests run: &quot;,
-                  Int.toString(Result.count_total result),
-                  &quot;, Failures: &quot;,
-                  Int.toString(Result.count_failures result),
-                  &quot;, Errors: &quot;,
-                  Int.toString(Result.count_errors result),
-                  &quot;, Time elapsed: &quot;,
-                  interval_to_string (Result.realtime result),
-                  &quot; - in &quot;,
-                  (Result.name result), &quot;&bsol;&#xfeff;n&quot;]
-        end;
-    in
-      fn result =&gt; Result.report for_case for_suite result
-    end;</pre>
+<pre data-lang="sml" class="src">  <span class="k">fun</span> <span class="n">report_iter</span> <span class="n">p</span> <span class="n">=</span>
+    <span class="k">let</span>
+      <span class="k">fun</span> <span class="n">for_case</span> <span class="n">c</span> <span class="n">=</span>
+        <span class="k">if</span> <span class="n">Result</span>.<span class="n">is_failure</span> <span class="n">c</span>
+        <span class="k">then</span> <span class="n">concat</span> <span class="p">[</span><span class="n">Test</span>.<span class="n">path</span> <span class="n">p</span> <span class="p">(</span><span class="n">Result</span>.<span class="n">name</span> <span class="n">c</span><span class="p">)</span><span class="p">,</span>
+                     <span class="s">&quot; FAIL: &quot;</span><span class="p">,</span>
+                     <span class="n">Result</span>.<span class="n">msg</span> <span class="n">c</span><span class="p">,</span>
+                     <span class="s">&quot;&bsol;&#xfeff;n&quot;</span><span class="p">]</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="n">Result</span>.<span class="n">is_error</span> <span class="n">c</span>
+        <span class="k">then</span> <span class="n">concat</span> <span class="p">[</span><span class="n">Test</span>.<span class="n">path</span> <span class="n">p</span> <span class="p">(</span><span class="n">Result</span>.<span class="n">name</span> <span class="n">c</span><span class="p">)</span><span class="p">,</span>
+                     <span class="s">&quot; ERROR: &quot;</span><span class="p">,</span>
+                     <span class="p">(</span><span class="n">Result</span>.<span class="n">exn_message</span> <span class="n">c</span><span class="p">)</span><span class="p">,</span>
+                     <span class="s">&quot;&bsol;&#xfeff;n&quot;</span><span class="p">]</span>
+        <span class="k">else</span> <span class="s">&quot;&quot;</span><span class="p">;</span>
+      <span class="k">fun</span> <span class="n">for_suite</span> <span class="n">result</span> <span class="n">rs</span> <span class="n">=</span>
+        <span class="k">let</span>
+          <span class="k">val</span> <span class="n">p2</span> <span class="n">=</span> <span class="n">Test</span>.<span class="n">path</span> <span class="n">p</span> <span class="p">(</span><span class="n">Result</span>.<span class="n">name</span> <span class="n">result</span><span class="p">)</span><span class="p">;</span>
+        <span class="k">in</span>
+          <span class="n">concat</span> <span class="p">[</span><span class="s">&quot;Running &quot;</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="s">&quot;&bsol;&#xfeff;n&quot;</span><span class="p">,</span>
+                  <span class="n">concat</span> <span class="p">(</span><span class="n">map</span> <span class="p">(</span><span class="n">report_iter</span> <span class="n">p2</span><span class="p">)</span> <span class="n">rs</span><span class="p">)</span><span class="p">,</span>
+                  <span class="s">&quot;Tests run: &quot;</span><span class="p">,</span>
+                  <span class="n">Int</span>.<span class="n">toString</span><span class="p">(</span><span class="n">Result</span>.<span class="n">count_total</span> <span class="n">result</span><span class="p">)</span><span class="p">,</span>
+                  <span class="s">&quot;, Failures: &quot;</span><span class="p">,</span>
+                  <span class="n">Int</span>.<span class="n">toString</span><span class="p">(</span><span class="n">Result</span>.<span class="n">count_failures</span> <span class="n">result</span><span class="p">)</span><span class="p">,</span>
+                  <span class="s">&quot;, Errors: &quot;</span><span class="p">,</span>
+                  <span class="n">Int</span>.<span class="n">toString</span><span class="p">(</span><span class="n">Result</span>.<span class="n">count_errors</span> <span class="n">result</span><span class="p">)</span><span class="p">,</span>
+                  <span class="s">&quot;, Time elapsed: &quot;</span><span class="p">,</span>
+                  <span class="n">interval_to_string</span> <span class="p">(</span><span class="n">Result</span>.<span class="n">realtime</span> <span class="n">result</span><span class="p">)</span><span class="p">,</span>
+                  <span class="s">&quot; - in &quot;</span><span class="p">,</span>
+                  <span class="p">(</span><span class="n">Result</span>.<span class="n">name</span> <span class="n">result</span><span class="p">)</span><span class="p">,</span> <span class="s">&quot;&bsol;&#xfeff;n&quot;</span><span class="p">]</span>
+        <span class="k">end</span><span class="p">;</span>
+    <span class="k">in</span>
+      <span class="k">fn</span> <span class="n">result</span> <span class="n">=&gt;</span> <span class="n">Result</span>.<span class="n">report</span> <span class="n">for_case</span> <span class="n">for_suite</span> <span class="n">result</span>
+    <span class="k">end</span><span class="p">;</span></pre>
 
 <p>
 The <code>report</code> function just prints the string we just constructed to
@@ -242,10 +242,10 @@ the screen. The <code>report_all</code> prints all the results to the screen.
 That's all there is to the JUnit-teletype reporter.
 </p>
 
-<pre data-lang="sml" class="src">  val report = print o (report_iter &quot;&quot;);
+<pre data-lang="sml" class="src">  <span class="k">val</span> <span class="n">report</span> <span class="n">=</span> <span class="n">print</span> <span class="n">o</span> <span class="p">(</span><span class="n">report_iter</span> <span class="s">&quot;&quot;</span><span class="p">)</span><span class="p">;</span>
 
-  val report_all = app report;
-end;</pre>
+  <span class="k">val</span> <span class="n">report_all</span> <span class="n">=</span> <span class="n">app</span> <span class="n">report</span><span class="p">;</span>
+<span class="k">end</span><span class="p">;</span></pre>
 
 <h2>Verbose Reporter</h2>
 
@@ -254,57 +254,57 @@ The verbose reporter is similar to the JUnit teletype reporter, but it
 reports <i>successes</i> as well as failures and errors.
 </p>
 
-<pre data-lang="sml" class="src">(*
+<pre data-lang="sml" class="src"><span class="c">(*
 Write every test result to the terminal. It&apos;s very...verbose...
-*)
-structure VerboseTt :&gt; REPORTER = struct
-  structure Result = Test.Result;
+*)</span>
+<span class="k">structure</span> <span class="n">VerboseTt</span> <span class="n">:&gt;</span> <span class="n">REPORTER</span> <span class="n">=</span> <span class="k">struct</span>
+  <span class="k">structure</span> <span class="n">Result</span> <span class="n">=</span> <span class="n">Test</span>.<span class="n">Result</span><span class="p">;</span>
 
-  fun interval_to_string (dt : Time.time) : string =
-    (LargeInt.toString (Time.toMicroseconds dt))^&quot;ms&quot;;
+  <span class="k">fun</span> <span class="n">interval_to_string</span> <span class="p">(</span><span class="n">dt</span> <span class="n">:</span> <span class="n">Time</span>.<span class="n">time</span><span class="p">)</span> <span class="n">:</span> <span class="n">string</span> <span class="n">=</span>
+    <span class="p">(</span><span class="n">LargeInt</span>.<span class="n">toString</span> <span class="p">(</span><span class="n">Time</span>.<span class="n">toMicroseconds</span> <span class="n">dt</span><span class="p">)</span><span class="p">)</span><span class="n">^</span><span class="s">&quot;ms&quot;</span><span class="p">;</span>
 
-  (* Print the results to the terminal *)
-  fun report_iter p =
-    let
-      fun for_case c =
-        if Result.is_failure c
-        then concat [Test.path p (Result.name c),
-                     &quot; FAIL: &quot;,
-                     Result.msg c,
-                     &quot;&bsol;&#xfeff;n&quot;]
-        else if Result.is_error c
-        then concat [Test.path p (Result.name c),
-                     &quot; ERROR: &quot;,
-                     (Result.exn_message c),
-                     &quot;&bsol;&#xfeff;n&quot;]
-        else concat [Test.path p (Result.name c),
-                     &quot; SUCCESS&bsol;&#xfeff;n&quot;];
-      fun for_suite result rs =
-        let
-          val p2 = Test.path p (Result.name result);
-        in
-          concat [&quot;Running &quot;, p2, &quot;&bsol;&#xfeff;n&quot;,
-                  concat (map (report_iter p2) rs),
-                  &quot;Tests run: &quot;,
-                  Int.toString(Result.count_total result),
-                  &quot;, Failures: &quot;,
-                  Int.toString(Result.count_failures result),
-                  &quot;, Errors: &quot;,
-                  Int.toString(Result.count_errors result),
-                  &quot;, Time elapsed: &quot;,
-                  interval_to_string (Result.realtime result),
-                  &quot; - in &quot;,
-                  (Result.name result), &quot;&bsol;&#xfeff;n&quot;]
-        end;
-    in
-      fn result =&gt; Result.report for_case for_suite result
-    end;
+  <span class="c">(* Print the results to the terminal *)</span>
+  <span class="k">fun</span> <span class="n">report_iter</span> <span class="n">p</span> <span class="n">=</span>
+    <span class="k">let</span>
+      <span class="k">fun</span> <span class="n">for_case</span> <span class="n">c</span> <span class="n">=</span>
+        <span class="k">if</span> <span class="n">Result</span>.<span class="n">is_failure</span> <span class="n">c</span>
+        <span class="k">then</span> <span class="n">concat</span> <span class="p">[</span><span class="n">Test</span>.<span class="n">path</span> <span class="n">p</span> <span class="p">(</span><span class="n">Result</span>.<span class="n">name</span> <span class="n">c</span><span class="p">)</span><span class="p">,</span>
+                     <span class="s">&quot; FAIL: &quot;</span><span class="p">,</span>
+                     <span class="n">Result</span>.<span class="n">msg</span> <span class="n">c</span><span class="p">,</span>
+                     <span class="s">&quot;&bsol;&#xfeff;n&quot;</span><span class="p">]</span>
+        <span class="k">else</span> <span class="k">if</span> <span class="n">Result</span>.<span class="n">is_error</span> <span class="n">c</span>
+        <span class="k">then</span> <span class="n">concat</span> <span class="p">[</span><span class="n">Test</span>.<span class="n">path</span> <span class="n">p</span> <span class="p">(</span><span class="n">Result</span>.<span class="n">name</span> <span class="n">c</span><span class="p">)</span><span class="p">,</span>
+                     <span class="s">&quot; ERROR: &quot;</span><span class="p">,</span>
+                     <span class="p">(</span><span class="n">Result</span>.<span class="n">exn_message</span> <span class="n">c</span><span class="p">)</span><span class="p">,</span>
+                     <span class="s">&quot;&bsol;&#xfeff;n&quot;</span><span class="p">]</span>
+        <span class="k">else</span> <span class="n">concat</span> <span class="p">[</span><span class="n">Test</span>.<span class="n">path</span> <span class="n">p</span> <span class="p">(</span><span class="n">Result</span>.<span class="n">name</span> <span class="n">c</span><span class="p">)</span><span class="p">,</span>
+                     <span class="s">&quot; SUCCESS&bsol;&#xfeff;n&quot;</span><span class="p">]</span><span class="p">;</span>
+      <span class="k">fun</span> <span class="n">for_suite</span> <span class="n">result</span> <span class="n">rs</span> <span class="n">=</span>
+        <span class="k">let</span>
+          <span class="k">val</span> <span class="n">p2</span> <span class="n">=</span> <span class="n">Test</span>.<span class="n">path</span> <span class="n">p</span> <span class="p">(</span><span class="n">Result</span>.<span class="n">name</span> <span class="n">result</span><span class="p">)</span><span class="p">;</span>
+        <span class="k">in</span>
+          <span class="n">concat</span> <span class="p">[</span><span class="s">&quot;Running &quot;</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="s">&quot;&bsol;&#xfeff;n&quot;</span><span class="p">,</span>
+                  <span class="n">concat</span> <span class="p">(</span><span class="n">map</span> <span class="p">(</span><span class="n">report_iter</span> <span class="n">p2</span><span class="p">)</span> <span class="n">rs</span><span class="p">)</span><span class="p">,</span>
+                  <span class="s">&quot;Tests run: &quot;</span><span class="p">,</span>
+                  <span class="n">Int</span>.<span class="n">toString</span><span class="p">(</span><span class="n">Result</span>.<span class="n">count_total</span> <span class="n">result</span><span class="p">)</span><span class="p">,</span>
+                  <span class="s">&quot;, Failures: &quot;</span><span class="p">,</span>
+                  <span class="n">Int</span>.<span class="n">toString</span><span class="p">(</span><span class="n">Result</span>.<span class="n">count_failures</span> <span class="n">result</span><span class="p">)</span><span class="p">,</span>
+                  <span class="s">&quot;, Errors: &quot;</span><span class="p">,</span>
+                  <span class="n">Int</span>.<span class="n">toString</span><span class="p">(</span><span class="n">Result</span>.<span class="n">count_errors</span> <span class="n">result</span><span class="p">)</span><span class="p">,</span>
+                  <span class="s">&quot;, Time elapsed: &quot;</span><span class="p">,</span>
+                  <span class="n">interval_to_string</span> <span class="p">(</span><span class="n">Result</span>.<span class="n">realtime</span> <span class="n">result</span><span class="p">)</span><span class="p">,</span>
+                  <span class="s">&quot; - in &quot;</span><span class="p">,</span>
+                  <span class="p">(</span><span class="n">Result</span>.<span class="n">name</span> <span class="n">result</span><span class="p">)</span><span class="p">,</span> <span class="s">&quot;&bsol;&#xfeff;n&quot;</span><span class="p">]</span>
+        <span class="k">end</span><span class="p">;</span>
+    <span class="k">in</span>
+      <span class="k">fn</span> <span class="n">result</span> <span class="n">=&gt;</span> <span class="n">Result</span>.<span class="n">report</span> <span class="n">for_case</span> <span class="n">for_suite</span> <span class="n">result</span>
+    <span class="k">end</span><span class="p">;</span>
 
-  val report = print o (report_iter &quot;&quot;);
+  <span class="k">val</span> <span class="n">report</span> <span class="n">=</span> <span class="n">print</span> <span class="n">o</span> <span class="p">(</span><span class="n">report_iter</span> <span class="s">&quot;&quot;</span><span class="p">)</span><span class="p">;</span>
 
-  val report_all = app report;
+  <span class="k">val</span> <span class="n">report_all</span> <span class="n">=</span> <span class="n">app</span> <span class="n">report</span><span class="p">;</span>
 
-end;</pre>
+<span class="k">end</span><span class="p">;</span></pre>
 
 <p>
 <footer>

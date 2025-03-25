@@ -128,34 +128,34 @@ and <code>stderr</code>, Reppy and Gansner's <cite class="book">The Standard ML
 Basis Library</cite> gives some pointers in section 8.2.4.)
 </p>
 
-<pre data-lang="sml" class="src">(*
+<pre data-lang="sml" class="src"><span class="c">(*
 TODO: capture everything printed to stdout and stderr, then
 allow the user access to these strings.
-*)
-signature TEST_RESULT = sig
-  type t;
-  val for_case : string -&gt; (unit -&gt; unit) -&gt; t;
-  val for_suite : string -&gt; (unit -&gt; (t list)) -&gt; t;
+*)</span>
+<span class="k">signature</span> <span class="n">TEST_RESULT</span> <span class="n">=</span> <span class="k">sig</span>
+  <span class="k">type</span> <span class="n">t</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">for_case</span> <span class="n">:</span> <span class="n">string</span> <span class="n">-&gt;</span> <span class="p">(</span><span class="n">unit</span> <span class="n">-&gt;</span> <span class="n">unit</span><span class="p">)</span> <span class="n">-&gt;</span> <span class="n">t</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">for_suite</span> <span class="n">:</span> <span class="n">string</span> <span class="n">-&gt;</span> <span class="p">(</span><span class="n">unit</span> <span class="n">-&gt;</span> <span class="p">(</span><span class="n">t</span> <span class="n">list</span><span class="p">)</span><span class="p">)</span> <span class="n">-&gt;</span> <span class="n">t</span><span class="p">;</span>
 
-  val report : (t -&gt; string) -&gt; (t -&gt; t list -&gt; string) -&gt; t -&gt; string;
+  <span class="k">val</span> <span class="n">report</span> <span class="n">:</span> <span class="p">(</span><span class="n">t</span> <span class="n">-&gt;</span> <span class="n">string</span><span class="p">)</span> <span class="n">-&gt;</span> <span class="p">(</span><span class="n">t</span> <span class="n">-&gt;</span> <span class="n">t</span> <span class="n">list</span> <span class="n">-&gt;</span> <span class="n">string</span><span class="p">)</span> <span class="n">-&gt;</span> <span class="n">t</span> <span class="n">-&gt;</span> <span class="n">string</span><span class="p">;</span>
 
-  val name : t -&gt; string;
-  val msg : t -&gt; string;
-  val exn_message : t -&gt; string;
-  (* realtime excludes the time it took a TestSuite to
-   allocate infrastructure in memory. *)
-  val realtime : t -&gt; Time.time;
-  val runtime : t -&gt; Time.time;
+  <span class="k">val</span> <span class="n">name</span> <span class="n">:</span> <span class="n">t</span> <span class="n">-&gt;</span> <span class="n">string</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">msg</span> <span class="n">:</span> <span class="n">t</span> <span class="n">-&gt;</span> <span class="n">string</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">exn_message</span> <span class="n">:</span> <span class="n">t</span> <span class="n">-&gt;</span> <span class="n">string</span><span class="p">;</span>
+  <span class="c">(* realtime excludes the time it took a TestSuite to
+   allocate infrastructure in memory. *)</span>
+  <span class="k">val</span> <span class="n">realtime</span> <span class="n">:</span> <span class="n">t</span> <span class="n">-&gt;</span> <span class="n">Time</span>.<span class="n">time</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">runtime</span> <span class="n">:</span> <span class="n">t</span> <span class="n">-&gt;</span> <span class="n">Time</span>.<span class="n">time</span><span class="p">;</span>
   
-  val is_success : t -&gt; bool;
-  val is_failure : t -&gt; bool;
-  val is_error : t -&gt; bool;
+  <span class="k">val</span> <span class="n">is_success</span> <span class="n">:</span> <span class="n">t</span> <span class="n">-&gt;</span> <span class="n">bool</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">is_failure</span> <span class="n">:</span> <span class="n">t</span> <span class="n">-&gt;</span> <span class="n">bool</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">is_error</span> <span class="n">:</span> <span class="n">t</span> <span class="n">-&gt;</span> <span class="n">bool</span><span class="p">;</span>
 
-  val count_successes : t -&gt; int;
-  val count_failures : t -&gt; int;
-  val count_errors : t -&gt; int;
-  val count_total : t -&gt; int;
-end;</pre>
+  <span class="k">val</span> <span class="n">count_successes</span> <span class="n">:</span> <span class="n">t</span> <span class="n">-&gt;</span> <span class="n">int</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">count_failures</span> <span class="n">:</span> <span class="n">t</span> <span class="n">-&gt;</span> <span class="n">int</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">count_errors</span> <span class="n">:</span> <span class="n">t</span> <span class="n">-&gt;</span> <span class="n">int</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">count_total</span> <span class="n">:</span> <span class="n">t</span> <span class="n">-&gt;</span> <span class="n">int</span><span class="p">;</span>
+<span class="k">end</span><span class="p">;</span></pre>
 
 <h2>Types for Test Results</h2>
 
@@ -183,13 +183,13 @@ suite (<b>NOT</b> the outcomes &mdash; what good would this do for nested
 test suites?).
 </p>
 
-<pre data-lang="sml" class="src">structure TestResult :&gt; TEST_RESULT = struct
-  datatype Outcome = Success
-                   | Failure of string
-                   | Error of exn;
+<pre data-lang="sml" class="src"><span class="k">structure</span> <span class="n">TestResult</span> <span class="n">:&gt;</span> <span class="n">TEST_RESULT</span> <span class="n">=</span> <span class="k">struct</span>
+  <span class="k">datatype</span> <span class="n">Outcome</span> <span class="n">=</span> <span class="n">Success</span>
+                   <span class="n">|</span> <span class="n">Failure</span> <span class="k">of</span> <span class="n">string</span>
+                   <span class="n">|</span> <span class="n">Error</span> <span class="k">of</span> <span class="n">exn</span><span class="p">;</span>
   
-  datatype t = Case of string * Time.time * Outcome
-             | Suite of string * Time.time * (t list);</pre>
+  <span class="k">datatype</span> <span class="n">t</span> <span class="n">=</span> <span class="n">Case</span> <span class="k">of</span> <span class="n">string</span> <span class="n">*</span> <span class="n">Time</span>.<span class="n">time</span> <span class="n">*</span> <span class="n">Outcome</span>
+             <span class="n">|</span> <span class="n">Suite</span> <span class="k">of</span> <span class="n">string</span> <span class="n">*</span> <span class="n">Time</span>.<span class="n">time</span> <span class="n">*</span> <span class="p">(</span><span class="n">t</span> <span class="n">list</span><span class="p">)</span><span class="p">;</span></pre>
 
 <h2>Smart Constructors</h2>
 
@@ -243,22 +243,22 @@ Strictly speaking, we could use a <a href="https://smlfamily.github.io/Basis/tim
 if we wanted to check the CPU time consumed.
 </p>
 
-<pre data-lang="sml" class="src">  fun for_case name assertion =
-    let
-      val start = Time.now();
-    in
-      (assertion();
-       Case(name,
-            (Time.-)(Time.now(), start),
-            Success))
-      handle Assert.Failure msg =&gt;
-             Case (name,
-                   (Time.-)(Time.now(), start),
-                   Failure msg)
-             | e =&gt; Case(name,
-                         (Time.-)(Time.now(), start),
-                         Error e)
-    end;</pre>
+<pre data-lang="sml" class="src">  <span class="k">fun</span> <span class="n">for_case</span> <span class="n">name</span> <span class="n">assertion</span> <span class="n">=</span>
+    <span class="k">let</span>
+      <span class="k">val</span> <span class="n">start</span> <span class="n">=</span> <span class="n">Time</span>.<span class="n">now</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">in</span>
+      <span class="p">(</span><span class="n">assertion</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+       <span class="n">Case</span><span class="p">(</span><span class="n">name</span><span class="p">,</span>
+            <span class="p">(</span><span class="n">Time</span>.<span class="n">-</span><span class="p">)</span><span class="p">(</span><span class="n">Time</span>.<span class="n">now</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span><span class="p">,</span>
+            <span class="n">Success</span><span class="p">)</span><span class="p">)</span>
+      <span class="k">handle</span> <span class="n">Assert</span>.<span class="n">Failure</span> <span class="n">msg</span> <span class="n">=&gt;</span>
+             <span class="n">Case</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span>
+                   <span class="p">(</span><span class="n">Time</span>.<span class="n">-</span><span class="p">)</span><span class="p">(</span><span class="n">Time</span>.<span class="n">now</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span><span class="p">,</span>
+                   <span class="n">Failure</span> <span class="n">msg</span><span class="p">)</span>
+             <span class="n">|</span> <span class="n">e</span> <span class="n">=&gt;</span> <span class="n">Case</span><span class="p">(</span><span class="n">name</span><span class="p">,</span>
+                         <span class="p">(</span><span class="n">Time</span>.<span class="n">-</span><span class="p">)</span><span class="p">(</span><span class="n">Time</span>.<span class="n">now</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span><span class="p">,</span>
+                         <span class="n">Error</span> <span class="n">e</span><span class="p">)</span>
+    <span class="k">end</span><span class="p">;</span></pre>
 
 <p>
 For a test suite, we simply record the start time, then determine the
@@ -270,14 +270,14 @@ tabulated, we record the interval <code>dt</code> it took to run all these tests
 Then we save these results in a test result object for a test suite.
 </p>
 
-<pre data-lang="sml" class="src">  fun for_suite name form_results =
-    let
-      val start = Time.now();
-      val results = form_results ();
-      val dt = (Time.-)(Time.now(), start);
-    in
-      Suite (name, dt, results)
-    end;</pre>
+<pre data-lang="sml" class="src">  <span class="k">fun</span> <span class="n">for_suite</span> <span class="n">name</span> <span class="n">form_results</span> <span class="n">=</span>
+    <span class="k">let</span>
+      <span class="k">val</span> <span class="n">start</span> <span class="n">=</span> <span class="n">Time</span>.<span class="n">now</span><span class="p">(</span><span class="p">)</span><span class="p">;</span>
+      <span class="k">val</span> <span class="n">results</span> <span class="n">=</span> <span class="n">form_results</span> <span class="p">(</span><span class="p">)</span><span class="p">;</span>
+      <span class="k">val</span> <span class="n">dt</span> <span class="n">=</span> <span class="p">(</span><span class="n">Time</span>.<span class="n">-</span><span class="p">)</span><span class="p">(</span><span class="n">Time</span>.<span class="n">now</span><span class="p">(</span><span class="p">)</span><span class="p">,</span> <span class="n">start</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">in</span>
+      <span class="n">Suite</span> <span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">dt</span><span class="p">,</span> <span class="n">results</span><span class="p">)</span>
+    <span class="k">end</span><span class="p">;</span></pre>
 
 <h2>Accessor functions</h2>
 
@@ -292,10 +292,10 @@ The user may want to know the name of the test which was run. This is
 a simple accessor function.
 </p>
 
-<pre data-lang="sml" class="src">(* *** accessor functions *** *)
+<pre data-lang="sml" class="src"><span class="c">(* *** accessor functions *** *)</span>
   
-  fun name (Case (n,_,_)) = n
-    | name (Suite (n,_,_)) = n;</pre>
+  <span class="k">fun</span> <span class="n">name</span> <span class="p">(</span><span class="n">Case</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="p">_</span><span class="p">,</span><span class="p">_</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span> <span class="n">n</span>
+    <span class="n">|</span> <span class="n">name</span> <span class="p">(</span><span class="n">Suite</span> <span class="p">(</span><span class="n">n</span><span class="p">,</span><span class="p">_</span><span class="p">,</span><span class="p">_</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span> <span class="n">n</span><span class="p">;</span></pre>
 
 <p>
 Now, we may want to know the time it took to run the test. This will
@@ -311,24 +311,24 @@ test cases only. These two functions are the same for test case
 results.
 </p>
 
-<pre data-lang="sml" class="src">  (* runtime : t -&gt; Time.time
+<pre data-lang="sml" class="src">  <span class="c">(* runtime : t -&gt; Time.time
 
 How long did it take to run the test(s) and construct the
-result(s)? *)
-  fun runtime (Case (_,dt,_)) = dt
-    | runtime (Suite (_,dt,_)) = dt;
+result(s)? *)</span>
+  <span class="k">fun</span> <span class="n">runtime</span> <span class="p">(</span><span class="n">Case</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="n">dt</span><span class="p">,</span><span class="p">_</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span> <span class="n">dt</span>
+    <span class="n">|</span> <span class="n">runtime</span> <span class="p">(</span><span class="n">Suite</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="n">dt</span><span class="p">,</span><span class="p">_</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span> <span class="n">dt</span><span class="p">;</span>
 
-  (* realtime : t -&gt; Time.time
+  <span class="c">(* realtime : t -&gt; Time.time
 
-How long did it take just to run the test(s)? *)
-  fun realtime (Case (_,dt,_)) = dt
-    | realtime (Suite (_,_,[])) = Time.zeroTime
-    | realtime (Suite (_,_,[x])) = realtime x
-    | realtime (Suite (_,_,r::rs)) =
-      foldl (fn (result,dt) =&gt;
-                (Time.+)(dt, realtime result))
-            (realtime r)
-            rs;</pre>
+How long did it take just to run the test(s)? *)</span>
+  <span class="k">fun</span> <span class="n">realtime</span> <span class="p">(</span><span class="n">Case</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="n">dt</span><span class="p">,</span><span class="p">_</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span> <span class="n">dt</span>
+    <span class="n">|</span> <span class="n">realtime</span> <span class="p">(</span><span class="n">Suite</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="p">_</span><span class="p">,</span><span class="p">[</span><span class="p">]</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span> <span class="n">Time</span>.<span class="n">zeroTime</span>
+    <span class="n">|</span> <span class="n">realtime</span> <span class="p">(</span><span class="n">Suite</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="p">_</span><span class="p">,</span><span class="p">[</span><span class="n">x</span><span class="p">]</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span> <span class="n">realtime</span> <span class="n">x</span>
+    <span class="n">|</span> <span class="n">realtime</span> <span class="p">(</span><span class="n">Suite</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="p">_</span><span class="p">,</span><span class="n">r</span><span class="n">::</span><span class="n">rs</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span>
+      <span class="n">foldl</span> <span class="p">(</span><span class="k">fn</span> <span class="p">(</span><span class="n">result</span><span class="p">,</span><span class="n">dt</span><span class="p">)</span> <span class="n">=&gt;</span>
+                <span class="p">(</span><span class="n">Time</span>.<span class="n">+</span><span class="p">)</span><span class="p">(</span><span class="n">dt</span><span class="p">,</span> <span class="n">realtime</span> <span class="n">result</span><span class="p">)</span><span class="p">)</span>
+            <span class="p">(</span><span class="n">realtime</span> <span class="n">r</span><span class="p">)</span>
+            <span class="n">rs</span><span class="p">;</span></pre>
 
 <h3>Counting results</h3>
 
@@ -350,32 +350,39 @@ for all tests in the suite.
 </li>
 </ul>
 
-<pre data-lang="sml" class="src">  fun count_successes (Case (_,_,Success)) = 1
-    | count_successes (Case _) = 0 
-    | count_successes (Suite (_,_,outcomes)) =
-      foldl (op +) 0 (map count_successes outcomes);</pre>
+<p>
+This could be improved slightly by changing the test suite code to
+something like
+<code>foldl (fn (outcome, acc) (acc + (count_successes outcome))) 0 outcomes</code>
+which avoids creating a temporary list.
+</p>
+
+<pre data-lang="sml" class="src">  <span class="k">fun</span> <span class="n">count_successes</span> <span class="p">(</span><span class="n">Case</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="p">_</span><span class="p">,</span><span class="n">Success</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span> <span class="m">1</span>
+    <span class="n">|</span> <span class="n">count_successes</span> <span class="p">(</span><span class="n">Case</span> <span class="p">_</span><span class="p">)</span> <span class="n">=</span> <span class="m">0</span> 
+    <span class="n">|</span> <span class="n">count_successes</span> <span class="p">(</span><span class="n">Suite</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="p">_</span><span class="p">,</span><span class="n">outcomes</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span>
+      <span class="n">foldl</span> <span class="p">(</span><span class="k">op</span> <span class="n">+</span><span class="p">)</span> <span class="m">0</span> <span class="p">(</span><span class="n">map</span> <span class="n">count_successes</span> <span class="n">outcomes</span><span class="p">)</span><span class="p">;</span></pre>
 
 <p>
 The reasoning is similar for counting failures and errors.
 </p>
 
-<pre data-lang="sml" class="src">  fun count_failures (Case (_,_,Failure _)) = 1
-    | count_failures (Case _) = 0
-    | count_failures (Suite (_,_,outcomes)) =
-      foldl (op +) 0 (map count_failures outcomes);
+<pre data-lang="sml" class="src">  <span class="k">fun</span> <span class="n">count_failures</span> <span class="p">(</span><span class="n">Case</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="p">_</span><span class="p">,</span><span class="n">Failure</span> <span class="p">_</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span> <span class="m">1</span>
+    <span class="n">|</span> <span class="n">count_failures</span> <span class="p">(</span><span class="n">Case</span> <span class="p">_</span><span class="p">)</span> <span class="n">=</span> <span class="m">0</span>
+    <span class="n">|</span> <span class="n">count_failures</span> <span class="p">(</span><span class="n">Suite</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="p">_</span><span class="p">,</span><span class="n">outcomes</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span>
+      <span class="n">foldl</span> <span class="p">(</span><span class="k">op</span> <span class="n">+</span><span class="p">)</span> <span class="m">0</span> <span class="p">(</span><span class="n">map</span> <span class="n">count_failures</span> <span class="n">outcomes</span><span class="p">)</span><span class="p">;</span>
 
-  fun count_errors (Case (_,_,Error _)) = 1
-    | count_errors (Case _) = 0
-    | count_errors (Suite (_,_,outcomes)) =
-      foldl (op +) 0 (map count_errors outcomes);</pre>
+  <span class="k">fun</span> <span class="n">count_errors</span> <span class="p">(</span><span class="n">Case</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="p">_</span><span class="p">,</span><span class="n">Error</span> <span class="p">_</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span> <span class="m">1</span>
+    <span class="n">|</span> <span class="n">count_errors</span> <span class="p">(</span><span class="n">Case</span> <span class="p">_</span><span class="p">)</span> <span class="n">=</span> <span class="m">0</span>
+    <span class="n">|</span> <span class="n">count_errors</span> <span class="p">(</span><span class="n">Suite</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="p">_</span><span class="p">,</span><span class="n">outcomes</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span>
+      <span class="n">foldl</span> <span class="p">(</span><span class="k">op</span> <span class="n">+</span><span class="p">)</span> <span class="m">0</span> <span class="p">(</span><span class="n">map</span> <span class="n">count_errors</span> <span class="n">outcomes</span><span class="p">)</span><span class="p">;</span></pre>
 
 <p>
 We also want to eventually tally the total number of tests run for a
 result, and this just adds up the previous three functions.
 </p>
 
-<pre data-lang="sml" class="src">  fun count_total x =
-    count_successes x + count_failures x + count_errors x;</pre>
+<pre data-lang="sml" class="src">  <span class="k">fun</span> <span class="n">count_total</span> <span class="n">x</span> <span class="n">=</span>
+    <span class="n">count_successes</span> <span class="n">x</span> <span class="n">+</span> <span class="n">count_failures</span> <span class="n">x</span> <span class="n">+</span> <span class="n">count_errors</span> <span class="n">x</span><span class="p">;</span></pre>
 
 <h3>Predicates for each outcome</h3>
 
@@ -399,7 +406,7 @@ Fortunately, this means the number of successes is equal to the number
 of tests. And this works for both test suites and test cases.
 </p>
 
-<pre data-lang="sml" class="src">  fun is_success x = (count_total x) = (count_successes x);</pre>
+<pre data-lang="sml" class="src">  <span class="k">fun</span> <span class="n">is_success</span> <span class="n">x</span> <span class="n">=</span> <span class="p">(</span><span class="n">count_total</span> <span class="n">x</span><span class="p">)</span> <span class="n">=</span> <span class="p">(</span><span class="n">count_successes</span> <span class="n">x</span><span class="p">)</span><span class="p">;</span></pre>
 
 <p>
 Now we have the trickier cases. When does a test "fail"? For a test
@@ -436,15 +443,15 @@ convention that <i>any</i> failure qualifies as <code>is_failure</code>, and tha
 The implementation for these predicates are then:
 </p>
 
-<pre data-lang="sml" class="src">  fun is_failure (Case (_,_, Failure _)) = true
-    | is_failure (Case _) = false
-    | is_failure (s as Suite _) =
-      (count_failures s) &gt; 0;
+<pre data-lang="sml" class="src">  <span class="k">fun</span> <span class="n">is_failure</span> <span class="p">(</span><span class="n">Case</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="p">_</span><span class="p">,</span> <span class="n">Failure</span> <span class="p">_</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span> <span class="n">true</span>
+    <span class="n">|</span> <span class="n">is_failure</span> <span class="p">(</span><span class="n">Case</span> <span class="p">_</span><span class="p">)</span> <span class="n">=</span> <span class="n">false</span>
+    <span class="n">|</span> <span class="n">is_failure</span> <span class="p">(</span><span class="n">s</span> <span class="k">as</span> <span class="n">Suite</span> <span class="p">_</span><span class="p">)</span> <span class="n">=</span>
+      <span class="p">(</span><span class="n">count_failures</span> <span class="n">s</span><span class="p">)</span> <span class="n">&gt;</span> <span class="m">0</span><span class="p">;</span>
 
-  fun is_error (Case (_,_, Error _)) = true
-    | is_error (Case _) = false
-    | is_error (s as Suite _) =
-      (count_errors s) &gt; 0;</pre>
+  <span class="k">fun</span> <span class="n">is_error</span> <span class="p">(</span><span class="n">Case</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="p">_</span><span class="p">,</span> <span class="n">Error</span> <span class="p">_</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span> <span class="n">true</span>
+    <span class="n">|</span> <span class="n">is_error</span> <span class="p">(</span><span class="n">Case</span> <span class="p">_</span><span class="p">)</span> <span class="n">=</span> <span class="n">false</span>
+    <span class="n">|</span> <span class="n">is_error</span> <span class="p">(</span><span class="n">s</span> <span class="k">as</span> <span class="n">Suite</span> <span class="p">_</span><span class="p">)</span> <span class="n">=</span>
+      <span class="p">(</span><span class="n">count_errors</span> <span class="n">s</span><span class="p">)</span> <span class="n">&gt;</span> <span class="m">0</span><span class="p">;</span></pre>
 
 <h3>Failure messages and exception messages</h3>
 
@@ -478,11 +485,11 @@ string. This just causes extra busy work, so I'm being sloppy ("do as
 I say, not as I do", etc.).
 </p>
 
-<pre data-lang="sml" class="src">  fun msg (Case (_,_,Failure msg)) = msg
-    | msg _ = &quot;&quot;;
+<pre data-lang="sml" class="src">  <span class="k">fun</span> <span class="n">msg</span> <span class="p">(</span><span class="n">Case</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="p">_</span><span class="p">,</span><span class="n">Failure</span> <span class="n">msg</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span> <span class="n">msg</span>
+    <span class="n">|</span> <span class="n">msg</span> <span class="p">_</span> <span class="n">=</span> <span class="s">&quot;&quot;</span><span class="p">;</span>
 
-  fun exn_message (Case (_,_,Error e)) = exnMessage e
-    | exn_message _ = &quot;&quot;; </pre>
+  <span class="k">fun</span> <span class="n">exn_message</span> <span class="p">(</span><span class="n">Case</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="p">_</span><span class="p">,</span><span class="n">Error</span> <span class="n">e</span><span class="p">)</span><span class="p">)</span> <span class="n">=</span> <span class="n">exnMessage</span> <span class="n">e</span>
+    <span class="n">|</span> <span class="n">exn_message</span> <span class="p">_</span> <span class="n">=</span> <span class="s">&quot;&quot;</span><span class="p">;</span> </pre>
 
 <h2>Reporting a test result</h2>
 
@@ -512,16 +519,16 @@ parameters, then produces a function <code>TestResult.t -&gt; string</code> usin
 these reporting functions to produce the result.
 </p>
 
-<pre data-lang="sml" class="src">  fun report case_report suite_report =
-    fn (c as Case _) =&gt; case_report c
-    | (s as Suite (_,_,results)) =&gt;
-      suite_report s results;</pre>
+<pre data-lang="sml" class="src">  <span class="k">fun</span> <span class="n">report</span> <span class="n">case_report</span> <span class="n">suite_report</span> <span class="n">=</span>
+    <span class="k">fn</span> <span class="p">(</span><span class="n">c</span> <span class="k">as</span> <span class="n">Case</span> <span class="p">_</span><span class="p">)</span> <span class="n">=&gt;</span> <span class="n">case_report</span> <span class="n">c</span>
+    <span class="n">|</span> <span class="p">(</span><span class="n">s</span> <span class="k">as</span> <span class="n">Suite</span> <span class="p">(</span><span class="p">_</span><span class="p">,</span><span class="p">_</span><span class="p">,</span><span class="n">results</span><span class="p">)</span><span class="p">)</span> <span class="n">=&gt;</span>
+      <span class="n">suite_report</span> <span class="n">s</span> <span class="n">results</span><span class="p">;</span></pre>
 
 <p>
 &hellip;and that's all! That's all we need for describing a test result.
 </p>
 
-<pre data-lang="sml" class="src">end;</pre>
+<pre data-lang="sml" class="src"><span class="k">end</span><span class="p">;</span></pre>
 
 <p>
 The reader might find it a fun exercise to capture anything written to

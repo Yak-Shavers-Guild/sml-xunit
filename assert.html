@@ -120,12 +120,12 @@ failure message as the <i>last</i> argument.
 The signature for this plan is:
 </p>
 
-<pre data-lang="sml" class="src">signature ASSERT = sig
-  exception Failure of string;
+<pre data-lang="sml" class="src"><span class="k">signature</span> <span class="n">ASSERT</span> <span class="n">=</span> <span class="k">sig</span>
+  <span class="k">exception</span> <span class="n">Failure</span> <span class="k">of</span> <span class="n">string</span><span class="p">;</span>
 
-  val !! : bool -&gt; string -&gt; unit;
-  val eq : &apos;&apos;a -&gt; &apos;&apos;a -&gt; string -&gt; unit;
-end;</pre>
+  <span class="k">val</span> <span class="n">!!</span> <span class="n">:</span> <span class="n">bool</span> <span class="n">-&gt;</span> <span class="n">string</span> <span class="n">-&gt;</span> <span class="n">unit</span><span class="p">;</span>
+  <span class="k">val</span> <span class="n">eq</span> <span class="n">:</span> <span class="n">&apos;&apos;a</span> <span class="n">-&gt;</span> <span class="n">&apos;&apos;a</span> <span class="n">-&gt;</span> <span class="n">string</span> <span class="n">-&gt;</span> <span class="n">unit</span><span class="p">;</span>
+<span class="k">end</span><span class="p">;</span></pre>
 
 <p>
 <details class="spec">
@@ -147,32 +147,32 @@ Similarly, we expect <code>Assert.!! false &quot;false fails&quot;</code> should
 <code>Assert.Failure &quot;false fails&quot;</code> exception.
 </p>
 
-<pre data-lang="sml" class="src">structure AssertTest : SUITE = struct
-  val assert_bangbang_true_test =
-    Test.new &quot;assert_bangbang_true_test&quot;
-             (fn () =&gt;
-                 Assert.!! true &quot;true should not fail&quot;);
+<pre data-lang="sml" class="src"><span class="k">structure</span> <span class="n">AssertTest</span> <span class="n">:</span> <span class="n">SUITE</span> <span class="n">=</span> <span class="k">struct</span>
+  <span class="k">val</span> <span class="n">assert_bangbang_true_test</span> <span class="n">=</span>
+    <span class="n">Test</span>.<span class="n">new</span> <span class="s">&quot;assert_bangbang_true_test&quot;</span>
+             <span class="p">(</span><span class="k">fn</span> <span class="p">(</span><span class="p">)</span> <span class="n">=&gt;</span>
+                 <span class="n">Assert</span>.<span class="n">!!</span> <span class="n">true</span> <span class="s">&quot;true should not fail&quot;</span><span class="p">)</span><span class="p">;</span>
 
-  val assert_bangbang_false_test =
-    Test.new &quot;assert_bangbang_false_test&quot;
-             (fn () =&gt;
-                 let
-                   val msg = &quot;false fails&quot;;
-                 in
-                   Assert.!! false msg
-                   handle (Assert.Failure s) =&gt;
-                          Assert.eq msg s (&quot;EXPECTED: &quot; ^
-                                           msg ^
-                                           &quot;&bsol;&#xfeff;nACTUAL: &quot; ^
-                                           s ^
-                                           &quot;&bsol;&#xfeff;n&quot;)
-                 end);
+  <span class="k">val</span> <span class="n">assert_bangbang_false_test</span> <span class="n">=</span>
+    <span class="n">Test</span>.<span class="n">new</span> <span class="s">&quot;assert_bangbang_false_test&quot;</span>
+             <span class="p">(</span><span class="k">fn</span> <span class="p">(</span><span class="p">)</span> <span class="n">=&gt;</span>
+                 <span class="k">let</span>
+                   <span class="k">val</span> <span class="n">msg</span> <span class="n">=</span> <span class="s">&quot;false fails&quot;</span><span class="p">;</span>
+                 <span class="k">in</span>
+                   <span class="n">Assert</span>.<span class="n">!!</span> <span class="n">false</span> <span class="n">msg</span>
+                   <span class="k">handle</span> <span class="p">(</span><span class="n">Assert</span>.<span class="n">Failure</span> <span class="n">s</span><span class="p">)</span> <span class="n">=&gt;</span>
+                          <span class="n">Assert</span>.<span class="n">eq</span> <span class="n">msg</span> <span class="n">s</span> <span class="p">(</span><span class="s">&quot;EXPECTED: &quot;</span> <span class="n">^</span>
+                                           <span class="n">msg</span> <span class="n">^</span>
+                                           <span class="s">&quot;&bsol;&#xfeff;nACTUAL: &quot;</span> <span class="n">^</span>
+                                           <span class="n">s</span> <span class="n">^</span>
+                                           <span class="s">&quot;&bsol;&#xfeff;n&quot;</span><span class="p">)</span>
+                 <span class="k">end</span><span class="p">)</span><span class="p">;</span>
 
-  val suite = Test.suite &quot;assert_test&quot; [
-      assert_bangbang_true_test
-    , assert_bangbang_false_test
-    ];
-end;</pre>
+  <span class="k">val</span> <span class="n">suite</span> <span class="n">=</span> <span class="n">Test</span>.<span class="n">suite</span> <span class="s">&quot;assert_test&quot;</span> <span class="p">[</span>
+      <span class="n">assert_bangbang_true_test</span>
+    <span class="p">,</span> <span class="n">assert_bangbang_false_test</span>
+    <span class="p">]</span><span class="p">;</span>
+<span class="k">end</span><span class="p">;</span></pre>
 
 <p>
 The <code>Assert.eq</code> function is just an abbreviation for <code>Assert.!!</code>, so
@@ -187,16 +187,16 @@ there's no need to test it.
 The implementation for this plan is equally as simple:
 </p>
 
-<pre data-lang="sml" class="src">structure Assert :&gt; ASSERT = struct
-  exception Failure of string;
+<pre data-lang="sml" class="src"><span class="k">structure</span> <span class="n">Assert</span> <span class="n">:&gt;</span> <span class="n">ASSERT</span> <span class="n">=</span> <span class="k">struct</span>
+  <span class="k">exception</span> <span class="n">Failure</span> <span class="k">of</span> <span class="n">string</span><span class="p">;</span>
 
-  fun !! is_success fail_msg =
-    if is_success then ()
-    else raise Failure fail_msg;
+  <span class="k">fun</span> <span class="n">!!</span> <span class="n">is_success</span> <span class="n">fail_msg</span> <span class="n">=</span>
+    <span class="k">if</span> <span class="n">is_success</span> <span class="k">then</span> <span class="p">(</span><span class="p">)</span>
+    <span class="k">else</span> <span class="k">raise</span> <span class="n">Failure</span> <span class="n">fail_msg</span><span class="p">;</span>
 
-  fun eq expected actual fail_msg =
-    !! (expected = actual) fail_msg;
-end;</pre>
+  <span class="k">fun</span> <span class="n">eq</span> <span class="n">expected</span> <span class="n">actual</span> <span class="n">fail_msg</span> <span class="n">=</span>
+    <span class="n">!!</span> <span class="p">(</span><span class="n">expected</span> <span class="n">=</span> <span class="n">actual</span><span class="p">)</span> <span class="n">fail_msg</span><span class="p">;</span>
+<span class="k">end</span><span class="p">;</span></pre>
 
 <p>
 <footer>

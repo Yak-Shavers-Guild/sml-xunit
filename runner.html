@@ -90,9 +90,9 @@ Since this function is just waiting to be run, and produces
 side-effects, it's a <code>unit -&gt; unit</code> function signature.
 </p>
 
-<pre data-lang="sml" class="src">signature RUNNER = sig
-  val run : unit -&gt; unit;
-end;</pre>
+<pre data-lang="sml" class="src"><span class="k">signature</span> <span class="n">RUNNER</span> <span class="n">=</span> <span class="k">sig</span>
+  <span class="k">val</span> <span class="n">run</span> <span class="n">:</span> <span class="n">unit</span> <span class="n">-&gt;</span> <span class="n">unit</span><span class="p">;</span>
+<span class="k">end</span><span class="p">;</span></pre>
 
 <h2>Parametrizing the Runner with a Reporter</h2>
 
@@ -110,20 +110,20 @@ successfully or not depending on if there were only successful test
 results or not, respectively).
 </p>
 
-<pre data-lang="sml" class="src">(*
+<pre data-lang="sml" class="src"><span class="c">(*
 Using any test reporter, we can run the tests, then
 report the results.
-*)
-functor MkRunner(Reporter : REPORTER) :&gt; RUNNER = struct
-  fun run () =
-    let
-      val results = Test.run_all ();
-    in
-      Reporter.report_all results;
-      OS.Process.exit (Test.exit_status results);
-      ()
-    end;
-end;</pre>
+*)</span>
+<span class="k">functor</span> <span class="n">MkRunner</span><span class="p">(</span><span class="n">Reporter</span> <span class="n">:</span> <span class="n">REPORTER</span><span class="p">)</span> <span class="n">:&gt;</span> <span class="n">RUNNER</span> <span class="n">=</span> <span class="k">struct</span>
+  <span class="k">fun</span> <span class="n">run</span> <span class="p">(</span><span class="p">)</span> <span class="n">=</span>
+    <span class="k">let</span>
+      <span class="k">val</span> <span class="n">results</span> <span class="n">=</span> <span class="n">Test</span>.<span class="n">run_all</span> <span class="p">(</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">in</span>
+      <span class="n">Reporter</span>.<span class="n">report_all</span> <span class="n">results</span><span class="p">;</span>
+      <span class="n">OS</span>.<span class="n">Process</span>.<span class="n">exit</span> <span class="p">(</span><span class="n">Test</span>.<span class="n">exit_status</span> <span class="n">results</span><span class="p">)</span><span class="p">;</span>
+      <span class="p">(</span><span class="p">)</span>
+    <span class="k">end</span><span class="p">;</span>
+<span class="k">end</span><span class="p">;</span></pre>
 
 <h2>Wrapping it all together</h2>
 
@@ -136,7 +136,7 @@ Working with MLton and Poly/ML, we also define the main function here
 for future usage.
 </p>
 
-<pre data-lang="sml" class="src">(*
+<pre data-lang="sml" class="src"><span class="c">(*
 
 Using the different reporters, we can run the tests, then
 report the results.
@@ -144,10 +144,10 @@ report the results.
 Defaults to the JUnitTt reporter.
 
 For inspecting per test result, VerboseTt.report may be useful
-*)
-structure Runner :&gt; RUNNER = MkRunner(JUnitTt);
+*)</span>
+<span class="k">structure</span> <span class="n">Runner</span> <span class="n">:&gt;</span> <span class="n">RUNNER</span> <span class="n">=</span> <span class="n">MkRunner</span><span class="p">(</span><span class="n">JUnitTt</span><span class="p">)</span><span class="p">;</span>
 
-val main = Runner.run;</pre>
+<span class="k">val</span> <span class="n">main</span> <span class="n">=</span> <span class="n">Runner</span>.<span class="n">run</span><span class="p">;</span></pre>
 
 <p>
 And we're done! Now we can use our lovely little testing library when
