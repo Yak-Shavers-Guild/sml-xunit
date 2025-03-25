@@ -119,6 +119,9 @@ OK, the basic plan for constructing a test result for a test case is:
   interval it took to run, and that an "error" outcome with exception
   `e` occurred.
 
+Strictly speaking, we could use a [`Timer`](https://smlfamily.github.io/Basis/timer.html)
+if we wanted to check the CPU time consumed.
+
 ```sml
   fun for_case name assertion =
     let
@@ -210,6 +213,11 @@ We can count the number of successes as follows:
   a `Success`, then return 1; otherwise, return 0.
 - For a test suite, simply sum the number of successes for each result
   for all tests in the suite.
+
+This could be improved slightly by changing the test suite code to
+something like
+`foldl (fn (outcome, acc) (acc + (count_successes outcome))) 0 outcomes`
+which avoids creating a temporary list.
 
 ```sml
   fun count_successes (Case (_,_,Success)) = 1

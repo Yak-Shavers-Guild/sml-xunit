@@ -49,20 +49,68 @@ signature ASSERT = sig
 end;
 ```
 
+<details class="spec">
+<summary>Tests for Assertions</summary>
+
+As an example of "test-driven development", we should provide some
+_specification_ for these two functions `Assert.!!` and `Assert.eq`.
+
+We would expect `Assert.!! true "true should not fail" = ()`, so we
+can make this into a unit test.
+
+Similarly, we expect `Assert.!! false "false fails"` should throw an
+`Assert.Failure "false fails"` exception.
+
+```sml {file=assert_test.sml}
+structure AssertTest : SUITE = struct
+  val assert_bangbang_true_test =
+    Test.new "assert_bangbang_true_test"
+             (fn () =>
+                 Assert.!! true "true should not fail");
+
+  val assert_bangbang_false_test =
+    Test.new "assert_bangbang_false_test"
+             (fn () =>
+                 let
+                   val msg = "false fails";
+                 in
+                   Assert.!! false msg
+                   handle (Assert.Failure s) =>
+                          Assert.eq msg s ("EXPECTED: " ^
+                                           msg ^
+                                           "\nACTUAL: " ^
+                                           s ^
+                                           "\n")
+                 end);
+
+  val suite = Test.suite "assert_test" [
+      assert_bangbang_true_test
+    , assert_bangbang_false_test
+    ];
+end;
+```
+
+The `Assert.eq` function is just an abbreviation for `Assert.!!`, so
+there's no need to test it.
+
+</details>
+
 The implementation for this plan is equally as simple:
 
 ```sml {file="assert.sml"}
 structure Assert :> ASSERT = struct
   exception Failure of string;
 
-  fun !! is_success msg =
+  fun !! is_success fail_msg =
     if is_success then ()
-    else raise Failure msg;
+    else raise Failure fail_msg;
 
-  fun eq expected actual msg =
-    !! (expected = actual) msg;
+  fun eq expected actual fail_msg =
+    !! (expected = actual) fail_msg;
 end;
 ```
+
+
 
 <footer>
 
